@@ -77,6 +77,18 @@
     <ClCompile Include="..\..\iPlug2\IGraphics\Drawing\IGraphicsSkia.cpp">
       <Filter>IGraphics\Drawing</Filter>
     </ClCompile>
+    <ClCompile Include="..\dsp\Envelope.cpp">
+      <Filter>dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dsp\Filter.cpp">
+      <Filter>dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dsp\Oscilator.cpp">
+      <Filter>dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dsp\Synth.cpp">
+      <Filter>dsp</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\ProphetW.h" />
@@ -258,6 +270,18 @@
     <ClInclude Include="..\..\iPlug2\IGraphics\ISender.h">
       <Filter>IGraphics</Filter>
     </ClInclude>
+    <ClInclude Include="..\dsp\Envelope.h">
+      <Filter>dsp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dsp\Filter.h">
+      <Filter>dsp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dsp\Oscilator.h">
+      <Filter>dsp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dsp\Synth.h">
+      <Filter>dsp</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="resources">
@@ -289,6 +313,9 @@
     </Filter>
     <Filter Include="IPlug\APP\RTAudioMidi\include">
       <UniqueIdentifier>{649c5de3-b4c2-4de9-8d57-3b1762646259}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="dsp">
+      <UniqueIdentifier>{ea258193-cf95-4020-9843-f4e1ad827667}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

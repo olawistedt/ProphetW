@@ -134,6 +134,18 @@
     <ClCompile Include="..\..\iPlug2\IGraphics\IGraphicsEditorDelegate.cpp">
       <Filter>IGraphics</Filter>
     </ClCompile>
+    <ClCompile Include="..\dsp\Envelope.cpp">
+      <Filter>dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dsp\Filter.cpp">
+      <Filter>dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dsp\Oscilator.cpp">
+      <Filter>dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dsp\Synth.cpp">
+      <Filter>dsp</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="../config.h" />
@@ -357,6 +369,18 @@
     <ClInclude Include="..\..\iPlug2\IGraphics\ISender.h">
       <Filter>IGraphics</Filter>
     </ClInclude>
+    <ClInclude Include="..\dsp\Envelope.h">
+      <Filter>dsp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dsp\Filter.h">
+      <Filter>dsp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dsp\Oscilator.h">
+      <Filter>dsp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dsp\Synth.h">
+      <Filter>dsp</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="resources">
@@ -415,6 +439,9 @@
     </Filter>
     <Filter Include="IPlug\VST3\VST3_SDK\plugininterfaces\base">
       <UniqueIdentifier>{5f06b03e-5093-46c0-9513-efb4e494c857}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="dsp">
+      <UniqueIdentifier>{ee783dfc-196e-49f8-a25e-fa0196e60b4c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
