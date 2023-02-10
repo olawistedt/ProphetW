@@ -7,14 +7,20 @@ const int kNumPresets = 1;
 
 enum EParams
 {
-  kParamGain = 0,
+  kParamRelease = 0,
+  kParamAttack,
+  kParamDecay,
+  kParamSustain,
   kNumParams
 };
 
 enum ECtrlTags
 {
   kCtrlTagVersionNumber = 0,
-  kCtrlTagSlider,
+  kCtrlTagSliderAttack,
+  kCtrlTagSliderDecay,
+  kCtrlTagSliderSustain,
+  kCtrlTagSliderRelease,
   kCtrlTagTitle,
   kCtrlTagKeyboard
 };
@@ -37,6 +43,8 @@ public:
   void ProcessBlock(sample** inputs, sample** outputs, int nFrames) override;
   void OnReset() override;
   void ProcessMidiMsg(const IMidiMsg& msg) override;
+  void OnParamChange(int paramIdx) override;
+
   Synth mSynth;
 protected:
   IMidiQueue mMidiQueue;

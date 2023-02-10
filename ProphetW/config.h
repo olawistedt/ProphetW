@@ -15,11 +15,11 @@
 
 #define SHARED_RESOURCES_SUBPATH "ProphetW"
 
-#define PLUG_CHANNEL_IO "2-2"
+#define PLUG_CHANNEL_IO "0-2"
 
 #define PLUG_LATENCY 0
-#define PLUG_TYPE 0
-#define PLUG_DOES_MIDI_IN 0
+#define PLUG_TYPE 1
+#define PLUG_DOES_MIDI_IN 1
 #define PLUG_DOES_MIDI_OUT 0
 #define PLUG_DOES_MPE 0
 #define PLUG_DOES_STATE_CHUNKS 0
@@ -56,3 +56,5 @@
 #define APP_SIGNAL_VECTOR_SIZE 64
 
 #define ROBOTO_FN "Roboto-Regular.ttf"
+
+#define PNGFX1LITTLE_FN "fx-1-100x100.png"

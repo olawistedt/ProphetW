@@ -27,10 +27,31 @@ Synth::Synth()
     m_note2freq[i] = (double)a;
     a *= k;
   }
-
-
-  //  m_osc2.period2logfile();
 }
+
+void Synth::setWaveform(int oscNr, unsigned char waveform)
+{
+  switch (oscNr)
+  {
+  case 1: m_osc1.setWaveform(waveform); break;
+  case 2: m_osc2.setWaveform(waveform); break;
+  case 3: m_osc3.setWaveform(waveform); break;
+  default: throw "Unknown waveform";
+  }
+}
+
+void Synth::setEnvelope(Envelope::type parameter, double value)
+{
+  switch (parameter)
+  {
+  case Envelope::kAttack:  m_envelope.setAttack(value); break;
+  case Envelope::kDecay:   m_envelope.setDecay(value); break;
+  case Envelope::kSustain: m_envelope.setSustain(value); break;
+  case Envelope::kRelease: m_envelope.setRelease(value); break;
+  default: throw "Unknown envelope";
+  }
+}
+
 
 void Synth::setSampleRate(long sampleRate)
 {

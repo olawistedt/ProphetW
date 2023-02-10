@@ -14,6 +14,16 @@ class Envelope
   void  setDecay          (double fMsec);
   void  setSustain        (double fLevel);
   void  setRelease        (double fMsec);
+
+  enum type
+  {
+    kAttack = 0,
+    kDecay,
+    kSustain,
+    kRelease,
+    kNumEnvelopes
+  };
+
  private:
   enum
   {

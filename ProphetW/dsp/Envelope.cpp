@@ -21,10 +21,10 @@ Envelope::Envelope()
 {
   m_ucInPhase = kIdle;
 
-  m_fAttack   = 0.5;
-  m_fDecay    = 0.5;
+  m_fAttack   = 100;  // Msek
+  m_fDecay    = 100;  // Msek
   m_fSustain  = 0.5;
-  m_fRelease  = 0.5;
+  m_fRelease  = 1000; // Msek
 }
 void  Envelope::restart()
 {

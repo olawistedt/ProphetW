@@ -8,7 +8,10 @@
 ProphetW::ProphetW(const InstanceInfo& info)
   : Plugin(info, MakeConfig(kNumParams, kNumPresets))
 {
-  GetParam(kParamGain)->InitDouble("Gain", 0., 0., 100.0, 0.01, "%");
+  GetParam(kParamAttack)->InitDouble("Attack", 0., 0., 1000.0, 0.1, "msec");
+  GetParam(kParamDecay)->InitDouble("Decay", 1000., 0., 3000.0, 0.1, "msec");
+  GetParam(kParamSustain)->InitDouble("Sustain", 0., 0., 100.0, 0.1, "%");
+  GetParam(kParamRelease)->InitDouble("Release", 1000., 0., 3000.0, 1.0, "msec");
 
 #if IPLUG_EDITOR // http://bit.ly/2S64BDd
   mMakeGraphicsFunc = [&]() {
@@ -16,25 +19,28 @@ ProphetW::ProphetW(const InstanceInfo& info)
   };
 
   mLayoutFunc = [&](IGraphics* pGraphics) {
+    const IBitmap knobLittleBitmap = pGraphics->LoadBitmap(PNGFX1LITTLE_FN, 127);
+
     const IRECT bounds = pGraphics->GetBounds();
-    const IRECT innerBounds = bounds.GetPadded(-10.f);
-    const IRECT sliderBounds = innerBounds.GetFromLeft(150).GetMidVPadded(100);
+    const IRECT innerBounds = bounds.GetPadded(-200.f);
+    const IRECT sliderBoundsAttack = innerBounds.GetFromLeft(200).GetMidVPadded(100);
+    const IRECT sliderBoundsDecay = innerBounds.GetFromLeft(300).GetMidVPadded(100);
+    const IRECT sliderBoundsRelease = innerBounds.GetFromLeft(400).GetMidVPadded(100);
+    const IRECT sliderBoundsSustain = innerBounds.GetFromLeft(500).GetMidVPadded(100);
     const IRECT versionBounds = innerBounds.GetFromTRHC(300, 20);
     const IRECT titleBounds = innerBounds.GetCentredInside(200, 50);
 
-    if (pGraphics->NControls()) {
-      pGraphics->GetBackgroundControl()->SetTargetAndDrawRECTs(bounds);
-      pGraphics->GetControlWithTag(kCtrlTagSlider)->SetTargetAndDrawRECTs(sliderBounds);
-      pGraphics->GetControlWithTag(kCtrlTagTitle)->SetTargetAndDrawRECTs(titleBounds);
-      pGraphics->GetControlWithTag(kCtrlTagVersionNumber)->SetTargetAndDrawRECTs(versionBounds);
-      return;
-    }
 
     pGraphics->SetLayoutOnResize(true);
     pGraphics->AttachCornerResizer(EUIResizerMode::Size, true);
     pGraphics->LoadFont("Roboto-Regular", ROBOTO_FN);
     pGraphics->AttachPanelBackground(COLOR_LIGHT_GRAY);
-    pGraphics->AttachControl(new IVSliderControl(sliderBounds, kParamGain), kCtrlTagSlider);
+
+    pGraphics->AttachControl(new IBKnobControl(510, 30, knobLittleBitmap, kParamAttack));
+    pGraphics->AttachControl(new IBKnobControl(610, 30, knobLittleBitmap, kParamDecay));
+    pGraphics->AttachControl(new IBKnobControl(710, 30, knobLittleBitmap, kParamSustain));
+    pGraphics->AttachControl(new IBKnobControl(810, 30, knobLittleBitmap, kParamRelease));
+
     pGraphics->AttachControl(new ITextControl(titleBounds, "ProphetW", IText(30)), kCtrlTagTitle);
     WDL_String buildInfoStr;
     GetBuildInfoStr(buildInfoStr, __DATE__, __TIME__);
@@ -78,7 +84,10 @@ void ProphetW::OnParentWindowResize(int width, int height)
 void ProphetW::OnReset()
 {
   mSynth.setSampleRate(static_cast<long>(GetSampleRate()));
-  mSynth.NoteOn(40);
+  mSynth.setWaveform(1, Oscilator::kSawTooth);
+  mSynth.setWaveform(2, Oscilator::kSawTooth);
+  mSynth.setWaveform(3, Oscilator::kSawTooth);
+  //  mSynth.NoteOn(40);
 }
 #endif
 
@@ -113,6 +122,26 @@ void ProphetW::ProcessMidiMsg(const IMidiMsg& msg)
 {
   TRACE;
   mMidiQueue.Add(msg); // Take care of MIDI events in ProcessBlock()
+}
+void ProphetW::OnParamChange(int paramIdx)
+{
+  double value = GetParam(paramIdx)->Value();
+
+  switch (paramIdx)
+  {
+  case kParamAttack:
+    mSynth.setEnvelope(Envelope::kAttack, value);
+    break;
+  case kParamDecay:
+    mSynth.setEnvelope(Envelope::kDecay, value);
+    break;
+  case kParamSustain:
+    mSynth.setEnvelope(Envelope::kSustain, value);
+    break;
+  case kParamRelease:
+    mSynth.setEnvelope(Envelope::kRelease, value);
+    break;
+  }
 }
 
 #endif
