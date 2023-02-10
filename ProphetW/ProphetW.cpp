@@ -10,8 +10,8 @@ ProphetW::ProphetW(const InstanceInfo& info)
 {
   GetParam(kParamAttack)->InitDouble("Attack", 0., 0., 1000.0, 0.1, "msec");
   GetParam(kParamDecay)->InitDouble("Decay", 1000., 0., 3000.0, 0.1, "msec");
-  GetParam(kParamSustain)->InitDouble("Sustain", 0., 0., 100.0, 0.1, "%");
-  GetParam(kParamRelease)->InitDouble("Release", 1000., 0., 3000.0, 1.0, "msec");
+  GetParam(kParamSustain)->InitDouble("Sustain", 0., 0., 1.0, 0.1, "%");
+  GetParam(kParamRelease)->InitDouble("Release", 0., 0., 3000.0, 1.0, "msec");
 
 #if IPLUG_EDITOR // http://bit.ly/2S64BDd
   mMakeGraphicsFunc = [&]() {
