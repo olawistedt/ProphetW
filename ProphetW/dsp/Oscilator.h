@@ -14,11 +14,12 @@ public:
   void           setFreq(double);
   void           setWaveform(unsigned char ucWaveform);
   void           setPulseWidth(double fPulseWidthInPercent);
+  void           setOsc(int oscNr, int value);
   unsigned short period(double* values);
 #ifdef __LOG_FILE__
   void           period2logfile();
 #endif
-  enum
+  enum oscType
   {
     kWaveBufSize = 4096,
       

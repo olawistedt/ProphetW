@@ -36,6 +36,7 @@ void Synth::setWaveform(int oscNr, unsigned char waveform)
   case 1: m_osc1.setWaveform(waveform); break;
   case 2: m_osc2.setWaveform(waveform); break;
   case 3: m_osc3.setWaveform(waveform); break;
+  case 4: m_osc4.setWaveform(waveform); break;
   default: throw "Unknown waveform";
   }
 }
@@ -51,7 +52,6 @@ void Synth::setEnvelope(Envelope::type parameter, double value)
   default: throw "Unknown envelope";
   }
 }
-
 
 void Synth::setSampleRate(long sampleRate)
 {

@@ -13,13 +13,18 @@ ProphetW::ProphetW(const InstanceInfo& info)
   GetParam(kParamSustain)->InitDouble("Sustain", 0., 0., 1.0, 0.1, "%");
   GetParam(kParamRelease)->InitDouble("Release", 0., 0., 3000.0, 1.0, "msec");
 
+  GetParam(kParamOsc1)->InitDouble("Osc1", 0., 0., 3.0, 1.0, "wave");
+  GetParam(kParamOsc2)->InitDouble("Osc2", 0., 0., 3.0, 1.0, "wave");
+  GetParam(kParamOsc3)->InitDouble("Osc3", 0., 0., 3.0, 1.0, "wave");
+
 #if IPLUG_EDITOR // http://bit.ly/2S64BDd
   mMakeGraphicsFunc = [&]() {
     return MakeGraphics(*this, PLUG_WIDTH, PLUG_HEIGHT, PLUG_FPS);
   };
 
   mLayoutFunc = [&](IGraphics* pGraphics) {
-    const IBitmap knobLittleBitmap = pGraphics->LoadBitmap(PNGFX1LITTLE_FN, 127);
+    const IBitmap knobLittleBitmap = pGraphics->LoadBitmap(PNGENVELOP_FN, 128);
+    const IBitmap knobOscBitmap = pGraphics->LoadBitmap(PNGOSC_FN, 3);
 
     const IRECT bounds = pGraphics->GetBounds();
     const IRECT innerBounds = bounds.GetPadded(-200.f);
@@ -40,6 +45,18 @@ ProphetW::ProphetW(const InstanceInfo& info)
     pGraphics->AttachControl(new IBKnobControl(610, 30, knobLittleBitmap, kParamDecay));
     pGraphics->AttachControl(new IBKnobControl(710, 30, knobLittleBitmap, kParamSustain));
     pGraphics->AttachControl(new IBKnobControl(810, 30, knobLittleBitmap, kParamRelease));
+
+
+    pGraphics->AttachControl(new IBKnobControl(110, 30, knobOscBitmap, kParamOsc1));
+    pGraphics->AttachControl(new IBKnobControl(210, 30, knobOscBitmap, kParamOsc2));
+    pGraphics->AttachControl(new IBKnobControl(310, 30, knobOscBitmap, kParamOsc3));
+    pGraphics->AttachControl(new IBKnobControl(410, 30, knobOscBitmap, kParamOsc4));
+
+
+
+
+
+
 
     pGraphics->AttachControl(new ITextControl(titleBounds, "ProphetW", IText(30)), kCtrlTagTitle);
     WDL_String buildInfoStr;
@@ -140,6 +157,18 @@ void ProphetW::OnParamChange(int paramIdx)
     break;
   case kParamRelease:
     mSynth.setEnvelope(Envelope::kRelease, value);
+    break;
+  case kParamOsc1:
+    mSynth.setWaveform(1, value);
+    break;
+  case kParamOsc2:
+    mSynth.setWaveform(2, value);
+    break;
+  case kParamOsc3:
+    mSynth.setWaveform(3, value);
+    break;
+  case kParamOsc4:
+    mSynth.setWaveform(4, value);
     break;
   }
 }

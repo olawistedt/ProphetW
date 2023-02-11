@@ -11,6 +11,10 @@ enum EParams
   kParamAttack,
   kParamDecay,
   kParamSustain,
+  kParamOsc1,
+  kParamOsc2,
+  kParamOsc3,
+  kParamOsc4,
   kNumParams
 };
 

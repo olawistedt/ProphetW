@@ -150,7 +150,8 @@ END
 BEGIN
     "#include ""..\\config.h""\r\n"
     "ROBOTO_FN TTF ROBOTO_FN\r\n"
-    "PNGFX1LITTLE_FN PNG PNGFX1LITTLE_FN\r\n"
+    "PNGENVELOP_FN PNG PNGENVELOP_FN\r\n"
+    "PNGOSC_FN PNG PNGOSC_FN\r\n"
     "\0"
 END
 
@@ -232,7 +233,8 @@ END
 //
 #include "..\config.h"
 ROBOTO_FN TTF ROBOTO_FN
-PNGFX1LITTLE_FN PNG PNGFX1LITTLE_FN
+PNGENVELOP_FN PNG PNGENVELOP_FN
+PNGOSC_FN PNG PNGOSC_FN
 
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED

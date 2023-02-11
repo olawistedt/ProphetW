@@ -57,4 +57,5 @@
 
 #define ROBOTO_FN "Roboto-Regular.ttf"
 
-#define PNGFX1LITTLE_FN "fx-1-100x100.png"
+#define PNGENVELOP_FN "envelop.png"
+#define PNGOSC_FN "osc.png"
