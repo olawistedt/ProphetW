@@ -28,6 +28,7 @@ private:
   double m_fOsc1Vol;
   double m_fOsc2Vol;
   double m_fOsc3Vol;
+  double m_fOsc4Vol;
   double m_fVolume;
 };
 

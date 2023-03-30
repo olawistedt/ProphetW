@@ -16,6 +16,7 @@ ProphetW::ProphetW(const InstanceInfo& info)
   GetParam(kParamOsc1)->InitDouble("Osc1", 0., 0., 3.0, 1.0, "wave");
   GetParam(kParamOsc2)->InitDouble("Osc2", 0., 0., 3.0, 1.0, "wave");
   GetParam(kParamOsc3)->InitDouble("Osc3", 0., 0., 3.0, 1.0, "wave");
+  GetParam(kParamOsc4)->InitDouble("Osc4", 0., 0., 3.0, 1.0, "wave");
 
 #if IPLUG_EDITOR // http://bit.ly/2S64BDd
   mMakeGraphicsFunc = [&]() {
@@ -104,6 +105,7 @@ void ProphetW::OnReset()
   mSynth.setWaveform(1, Oscilator::kSawTooth);
   mSynth.setWaveform(2, Oscilator::kSawTooth);
   mSynth.setWaveform(3, Oscilator::kSawTooth);
+  mSynth.setWaveform(4, Oscilator::kSawTooth);
   //  mSynth.NoteOn(40);
 }
 #endif
