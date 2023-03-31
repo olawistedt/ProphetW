@@ -59,3 +59,4 @@
 
 #define PNGENVELOP_FN "envelop.png"
 #define PNGOSC_FN "osc.png"
+#define PNGMOOG_FN "knbMoog.png"

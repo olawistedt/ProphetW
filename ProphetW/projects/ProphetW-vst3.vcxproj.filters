@@ -463,4 +463,7 @@
       <Filter>config</Filter>
     </None>
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\resources\ProphetW.ico" />
+  </ItemGroup>
 </Project>

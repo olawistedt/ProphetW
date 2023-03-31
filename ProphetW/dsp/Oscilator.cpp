@@ -1,4 +1,5 @@
 #include "Oscilator.h"
+#include <Windows.h>
 
 //-----------------------------------------------------------------------------------------
 // Oscilator
@@ -75,6 +76,20 @@ void Oscilator::setFreq(double fFreq)
 
 void Oscilator::setWaveform(unsigned char ucWaveform)
 {
+#ifdef _DEBUG
+  OutputDebugStringA("Setting waveform ");
+  switch (ucWaveform)
+  {
+  case kSquare: OutputDebugStringA("Square"); break;
+  case kSawTooth: OutputDebugStringA("Saw tooth"); break;
+  case kSine: OutputDebugStringA("Sine"); break;
+  default:
+    OutputDebugStringA("Unknown waveform.");
+    break;
+  }
+  OutputDebugStringA("\n");
+#endif // _DEBUG
+  
   m_ucWaveform = ucWaveform;
 }
 

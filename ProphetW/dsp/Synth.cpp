@@ -12,11 +12,11 @@ Synth::Synth()
   m_osc4.setWaveform(Oscilator::kSine);
   m_envelope = Envelope();
 
-  m_fOsc1Vol = 0.5f;
-  m_fOsc2Vol = 0.5f;
-  m_fOsc3Vol = 0.5f;
-  m_fOsc4Vol = 0.5f;
-  m_fVolume = 0.5f;
+  mOsc1Vol = 0.5f;
+  mOsc2Vol = 0.0f;
+  mOsc3Vol = 0.0f;
+  mOsc4Vol = 0.0f;
+  mVolume = 0.5f;
 
   // ------------- Build note to frequence table ------------------
   // Convert note to frequence.
@@ -41,6 +41,18 @@ void Synth::setWaveform(int oscNr, unsigned char waveform)
   case 3: m_osc3.setWaveform(waveform); break;
   case 4: m_osc4.setWaveform(waveform); break;
   default: throw "Unknown waveform";
+  }
+}
+
+void Synth::setOscVol(int oscNr, double vol)
+{
+  switch (oscNr)
+  {
+  case 1: mOsc1Vol = vol; break;
+  case 2: mOsc2Vol = vol; break;
+  case 3: mOsc3Vol = vol; break;
+  case 4: mOsc4Vol = vol; break;
+  default: throw "Unknown oscilator";
   }
 }
 
@@ -84,17 +96,17 @@ static double m_fCurrentEnvelopeVal;
 double Synth::getLeft()
 {
   m_fCurrentEnvelopeVal = m_envelope.get();
-  return ((m_osc1.get() * m_fOsc1Vol +
-    m_osc2.get() * m_fOsc2Vol +
-    m_osc3.get() * m_fOsc3Vol +
-    m_osc4.get() * m_fOsc4Vol) / 4.0) * m_fCurrentEnvelopeVal * m_fVolume;
+  return ((m_osc1.get() * mOsc1Vol +
+    m_osc2.get() * mOsc2Vol +
+    m_osc3.get() * mOsc3Vol +
+    m_osc4.get() * mOsc4Vol) / 4.0) * m_fCurrentEnvelopeVal * mVolume;
 }
 
 double Synth::getRight()
 {
   m_fCurrentEnvelopeVal = m_envelope.get();
-  return ((m_osc1.get() * m_fOsc1Vol +
-    m_osc2.get() * m_fOsc2Vol +
-    m_osc3.get() * m_fOsc3Vol +
-    m_osc4.get() * m_fOsc4Vol) / 4.0) * m_fCurrentEnvelopeVal * m_fVolume;
+  return ((m_osc1.get() * mOsc1Vol +
+    m_osc2.get() * mOsc2Vol +
+    m_osc3.get() * mOsc3Vol +
+    m_osc4.get() * mOsc4Vol) / 4.0) * m_fCurrentEnvelopeVal * mVolume;
 }

@@ -15,6 +15,10 @@ enum EParams
   kParamOsc2,
   kParamOsc3,
   kParamOsc4,
+  kParamOsc1Vol,
+  kParamOsc2Vol,
+  kParamOsc3Vol,
+  kParamOsc4Vol,
   kNumParams
 };
 
@@ -47,7 +51,8 @@ public:
   void ProcessBlock(sample** inputs, sample** outputs, int nFrames) override;
   void OnReset() override;
   void ProcessMidiMsg(const IMidiMsg& msg) override;
-  void OnParamChange(int paramIdx) override;
+//  void OnParamChange(int paramIdx) override;
+  void OnParamChangeUI(int paramIdx, EParamSource source = kUnknown) override;
 
   Synth mSynth;
 protected:

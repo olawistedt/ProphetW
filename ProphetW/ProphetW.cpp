@@ -18,6 +18,11 @@ ProphetW::ProphetW(const InstanceInfo& info)
   GetParam(kParamOsc3)->InitDouble("Osc3", 0., 0., 3.0, 1.0, "wave");
   GetParam(kParamOsc4)->InitDouble("Osc4", 0., 0., 3.0, 1.0, "wave");
 
+  GetParam(kParamOsc1Vol)->InitDouble("Osc1 Vol", 0., 0., 1.0, 0.1, "db");
+  GetParam(kParamOsc2Vol)->InitDouble("Osc2 Vol", 0., 0., 1.0, 0.1, "db");
+  GetParam(kParamOsc3Vol)->InitDouble("Osc3 Vol", 0., 0., 1.0, 0.1, "db");
+  GetParam(kParamOsc4Vol)->InitDouble("Osc4 Vol", 0., 0., 1.0, 0.1, "db");
+
 #if IPLUG_EDITOR // http://bit.ly/2S64BDd
   mMakeGraphicsFunc = [&]() {
     return MakeGraphics(*this, PLUG_WIDTH, PLUG_HEIGHT, PLUG_FPS);
@@ -26,6 +31,8 @@ ProphetW::ProphetW(const InstanceInfo& info)
   mLayoutFunc = [&](IGraphics* pGraphics) {
     const IBitmap knobLittleBitmap = pGraphics->LoadBitmap(PNGENVELOP_FN, 128);
     const IBitmap knobOscBitmap = pGraphics->LoadBitmap(PNGOSC_FN, 3);
+    const IBitmap knobMoogBitmap = pGraphics->LoadBitmap(PNGMOOG_FN, 127);
+
 
     const IRECT bounds = pGraphics->GetBounds();
     const IRECT innerBounds = bounds.GetPadded(-200.f);
@@ -53,9 +60,10 @@ ProphetW::ProphetW(const InstanceInfo& info)
     pGraphics->AttachControl(new IBKnobControl(310, 30, knobOscBitmap, kParamOsc3));
     pGraphics->AttachControl(new IBKnobControl(410, 30, knobOscBitmap, kParamOsc4));
 
-
-
-
+    pGraphics->AttachControl(new IBKnobControl(110, 80, knobMoogBitmap, kParamOsc1Vol));
+    pGraphics->AttachControl(new IBKnobControl(210, 80, knobMoogBitmap, kParamOsc2Vol));
+    pGraphics->AttachControl(new IBKnobControl(310, 80, knobMoogBitmap, kParamOsc3Vol));
+    pGraphics->AttachControl(new IBKnobControl(410, 80, knobMoogBitmap, kParamOsc4Vol));
 
 
 
@@ -142,8 +150,14 @@ void ProphetW::ProcessMidiMsg(const IMidiMsg& msg)
   TRACE;
   mMidiQueue.Add(msg); // Take care of MIDI events in ProcessBlock()
 }
-void ProphetW::OnParamChange(int paramIdx)
+//void ProphetW::OnParamChange(int paramIdx)
+void ProphetW::OnParamChangeUI(int paramIdx, EParamSource source)
 {
+  if (source != kUI)
+  {
+    return;
+  }
+
   double value = GetParam(paramIdx)->Value();
 
   switch (paramIdx)
@@ -161,16 +175,27 @@ void ProphetW::OnParamChange(int paramIdx)
     mSynth.setEnvelope(Envelope::kRelease, value);
     break;
   case kParamOsc1:
-    mSynth.setWaveform(1, value);
-    break;
   case kParamOsc2:
-    mSynth.setWaveform(2, value);
-    break;
   case kParamOsc3:
-    mSynth.setWaveform(3, value);
-    break;
   case kParamOsc4:
-    mSynth.setWaveform(4, value);
+    if (value < 0.25)
+    {
+      mSynth.setWaveform(1 + paramIdx - kParamOsc1, Oscilator::kSquare);
+    }
+    else if (value > 0.25 && value < 0.75)
+    {
+      mSynth.setWaveform(1 + paramIdx - kParamOsc1, Oscilator::kSawTooth);
+    }
+    else if (value > 0.75)
+    {
+      mSynth.setWaveform(1 + paramIdx - kParamOsc1, Oscilator::kSine);
+    }
+    break;
+  case kParamOsc1Vol:
+  case kParamOsc2Vol:
+  case kParamOsc3Vol:
+  case kParamOsc4Vol:
+    mSynth.setOscVol(1 + paramIdx - kParamOsc1Vol, value);
     break;
   }
 }

@@ -17,6 +17,7 @@ public:
   double m_note2freq[128];
 
   void setWaveform(int oscNr, unsigned char waveform);
+  void setOscVol(int oscNr, double vol);
   void setEnvelope(Envelope::type parameter, double value);
 
 private:
@@ -25,11 +26,11 @@ private:
   Oscilator m_osc3;
   Oscilator m_osc4;
   Envelope  m_envelope;
-  double m_fOsc1Vol;
-  double m_fOsc2Vol;
-  double m_fOsc3Vol;
-  double m_fOsc4Vol;
-  double m_fVolume;
+  double mOsc1Vol;
+  double mOsc2Vol;
+  double mOsc3Vol;
+  double mOsc4Vol;
+  double mVolume;
 };
 
 #endif // __SYNTH_H__
