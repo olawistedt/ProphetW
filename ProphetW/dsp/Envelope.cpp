@@ -69,6 +69,16 @@ double Envelope::get()
 
   double fRet = 1.0;
 
+  static bool isBypassEnvelope = false;
+  if (isBypassEnvelope)
+  {
+    if (m_ucInPhase == kReleasePhase)
+    {
+      return 0.0;
+    }
+    return 1.0;
+  }
+
   if(m_ucInPhase == kAttackPhase)
   {
     if(m_ulCurrent == m_ulAttackEnds)

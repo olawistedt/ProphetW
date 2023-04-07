@@ -1,5 +1,6 @@
 #include "ProphetW.h"
 #include "IPlug_include_in_plug_src.h"
+#include <string>
 
 #if IPLUG_EDITOR
 #include "IControls.h"
@@ -13,10 +14,10 @@ ProphetW::ProphetW(const InstanceInfo& info)
   GetParam(kParamSustain)->InitDouble("Sustain", 0., 0., 1.0, 0.1, "%");
   GetParam(kParamRelease)->InitDouble("Release", 0., 0., 3000.0, 1.0, "msec");
 
-  GetParam(kParamOsc1)->InitDouble("Osc1", 0., 0., 3.0, 1.0, "wave");
-  GetParam(kParamOsc2)->InitDouble("Osc2", 0., 0., 3.0, 1.0, "wave");
-  GetParam(kParamOsc3)->InitDouble("Osc3", 0., 0., 3.0, 1.0, "wave");
-  GetParam(kParamOsc4)->InitDouble("Osc4", 0., 0., 3.0, 1.0, "wave");
+  GetParam(kParamOsc1)->InitInt("Osc1", 0, 0, 2, "wave1");
+  GetParam(kParamOsc2)->InitInt("Osc2", 0, 0, 2, "wave2");
+  GetParam(kParamOsc3)->InitInt("Osc3", 0, 0, 2, "wave3");
+  GetParam(kParamOsc4)->InitInt("Osc4", 0, 0, 2, "wave4");
 
   GetParam(kParamOsc1Vol)->InitDouble("Osc1 Vol", 0., 0., 1.0, 0.1, "db");
   GetParam(kParamOsc2Vol)->InitDouble("Osc2 Vol", 0., 0., 1.0, 0.1, "db");
@@ -47,7 +48,12 @@ ProphetW::ProphetW(const InstanceInfo& info)
     pGraphics->SetLayoutOnResize(true);
     pGraphics->AttachCornerResizer(EUIResizerMode::Size, true);
     pGraphics->LoadFont("Roboto-Regular", ROBOTO_FN);
+
     pGraphics->AttachPanelBackground(COLOR_LIGHT_GRAY);
+    //// Background
+    //pGraphics->LoadBitmap(BACKGROUND_FN, 1, true);
+    //pGraphics->AttachBackground(BACKGROUND_FN);
+
 
     pGraphics->AttachControl(new IBKnobControl(510, 30, knobLittleBitmap, kParamAttack));
     pGraphics->AttachControl(new IBKnobControl(610, 30, knobLittleBitmap, kParamDecay));
@@ -110,10 +116,10 @@ void ProphetW::OnParentWindowResize(int width, int height)
 void ProphetW::OnReset()
 {
   mSynth.setSampleRate(static_cast<long>(GetSampleRate()));
-  mSynth.setWaveform(1, Oscilator::kSawTooth);
-  mSynth.setWaveform(2, Oscilator::kSawTooth);
-  mSynth.setWaveform(3, Oscilator::kSawTooth);
-  mSynth.setWaveform(4, Oscilator::kSawTooth);
+  //mSynth.setWaveform(1, Oscilator::kSawTooth);
+  //mSynth.setWaveform(2, Oscilator::kSawTooth);
+  //mSynth.setWaveform(3, Oscilator::kSawTooth);
+  //mSynth.setWaveform(4, Oscilator::kSawTooth);
   //  mSynth.NoteOn(40);
 }
 #endif
@@ -153,10 +159,10 @@ void ProphetW::ProcessMidiMsg(const IMidiMsg& msg)
 //void ProphetW::OnParamChange(int paramIdx)
 void ProphetW::OnParamChangeUI(int paramIdx, EParamSource source)
 {
-  if (source != kUI)
-  {
-    return;
-  }
+  //if (source != kUI)
+  //{
+  //  return;
+  //}
 
   double value = GetParam(paramIdx)->Value();
 
@@ -178,15 +184,18 @@ void ProphetW::OnParamChangeUI(int paramIdx, EParamSource source)
   case kParamOsc2:
   case kParamOsc3:
   case kParamOsc4:
-    if (value < 0.25)
+#ifdef _DEBUG
+    OutputDebugStringA(std::string("Waveform: " + std::to_string(value) + "\n").c_str());
+#endif // _DEBUG
+    if (value == 0.0)
     {
       mSynth.setWaveform(1 + paramIdx - kParamOsc1, Oscilator::kSquare);
     }
-    else if (value > 0.25 && value < 0.75)
+    else if (value == 1.0)
     {
       mSynth.setWaveform(1 + paramIdx - kParamOsc1, Oscilator::kSawTooth);
     }
-    else if (value > 0.75)
+    else if (value == 2.0)
     {
       mSynth.setWaveform(1 + paramIdx - kParamOsc1, Oscilator::kSine);
     }

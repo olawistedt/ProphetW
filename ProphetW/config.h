@@ -57,6 +57,7 @@
 
 #define ROBOTO_FN "Roboto-Regular.ttf"
 
+#define BACKGROUND_FN "background.png"
 #define PNGENVELOP_FN "envelop.png"
 #define PNGOSC_FN "osc.png"
 #define PNGMOOG_FN "knbMoog.png"
