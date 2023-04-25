@@ -1,5 +1,4 @@
 #include "Oscilator.h"
-#include <Windows.h>
 
 #define _USE_MATH_DEFINES // To get M_PI
 #include <math.h>
