@@ -5,6 +5,11 @@ IPLUG2_ROOT = ../../iPlug2
 include ../../common-web.mk
 
 SRC += $(PROJECT_ROOT)/ProphetW.cpp
+SRC += $(PROJECT_ROOT)/dsp/Envelope.cpp
+SRC += $(PROJECT_ROOT)/dsp/Filter.cpp
+SRC += $(PROJECT_ROOT)/dsp/Oscilator.cpp
+SRC += $(PROJECT_ROOT)/dsp/Synth.cpp
+
 
 # WAM_SRC += 
 
