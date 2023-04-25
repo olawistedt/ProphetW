@@ -106,7 +106,7 @@ ProphetW::ProphetW(const InstanceInfo& info)
 #endif
 }
 
-#if IPLUG_EDITOR
+#if IPLUG_DSP
 
 void ProphetW::OnReset()
 {
