@@ -2,21 +2,29 @@
 
 Synth::Synth()
 {
-  m_osc1 = Oscilator();
-  m_osc2 = Oscilator();
-  m_osc3 = Oscilator();
-  m_osc4 = Oscilator();
-  m_osc1.setWaveform(Oscilator::kSquare);
-  m_osc2.setWaveform(Oscilator::kSawTooth);
-  m_osc3.setWaveform(Oscilator::kSine);
-  m_osc4.setWaveform(Oscilator::kSine);
+  for (int i = 0; i < 16; i++)
+  {
+    m_osc[i] = Oscilator();
+    if (i % 4 == 0)
+    {
+      m_osc[i].setWaveform(Oscilator::kSquare);
+    }
+    else if (i % 4 == 1)
+    {
+      m_osc[i].setWaveform(Oscilator::kSawTooth);
+    }
+    else if (i % 4 == 2)
+    {
+      m_osc[i].setWaveform(Oscilator::kTriangle);
+    }
+    else if (i % 4 == 3)
+    {
+      m_osc[i].setWaveform(Oscilator::kSine);
+    }
+  }
   m_envelope = Envelope();
 
-  mOsc1Vol = 0.5f;
-  mOsc2Vol = 0.0f;
-  mOsc3Vol = 0.0f;
-  mOsc4Vol = 0.0f;
-  mVolume = 0.5f;
+  mVolume = 1.0; // Master volume
 
   // ------------- Build note to frequence table ------------------
   // Convert note to frequence.
@@ -32,26 +40,14 @@ Synth::Synth()
   }
 }
 
-void Synth::setWaveform(int oscNr, unsigned char waveform)
-{
-  switch (oscNr)
-  {
-  case 1: m_osc1.setWaveform(waveform); break;
-  case 2: m_osc2.setWaveform(waveform); break;
-  case 3: m_osc3.setWaveform(waveform); break;
-  case 4: m_osc4.setWaveform(waveform); break;
-  default: throw "Unknown waveform";
-  }
-}
-
 void Synth::setOscVol(int oscNr, double vol)
 {
   switch (oscNr)
   {
-  case 1: mOsc1Vol = vol; break;
-  case 2: mOsc2Vol = vol; break;
-  case 3: mOsc3Vol = vol; break;
-  case 4: mOsc4Vol = vol; break;
+  case 0: mOsc1Vol = vol; break;
+  case 1: mOsc2Vol = vol; break;
+  case 2: mOsc3Vol = vol; break;
+  case 3: mOsc4Vol = vol; break;
   default: throw "Unknown oscilator";
   }
 }
@@ -70,19 +66,21 @@ void Synth::setEnvelope(Envelope::type parameter, double value)
 
 void Synth::setSampleRate(long sampleRate)
 {
-  m_osc1.setSampleRate(sampleRate);
-  m_osc2.setSampleRate(sampleRate);
-  m_osc3.setSampleRate(sampleRate);
-  m_osc4.setSampleRate(sampleRate);
+  for (int i = 0; i < 16; i++)
+  {
+    m_osc[i].setSampleRate(sampleRate);
+  }
+
   m_envelope.setSampleRate(sampleRate);
 }
 
 void Synth::NoteOn(unsigned char ucNote)
 {
-  m_osc1.setFreq(m_note2freq[ucNote]);
-  m_osc2.setFreq(m_note2freq[ucNote]);
-  m_osc3.setFreq(m_note2freq[ucNote]);
-  m_osc4.setFreq(m_note2freq[ucNote]);
+  for (int i = 0; i < 16; i++)
+  {
+    m_osc[i].setFreq(m_note2freq[ucNote]);
+  }
+
   m_envelope.restart();
 }
 
@@ -93,20 +91,27 @@ void Synth::NoteOff(unsigned char ucNote)
 
 static double m_fCurrentEnvelopeVal;
 
-double Synth::getLeft()
+double Synth::getMono()
 {
   m_fCurrentEnvelopeVal = m_envelope.get();
-  return ((m_osc1.get() * mOsc1Vol +
-    m_osc2.get() * mOsc2Vol +
-    m_osc3.get() * mOsc3Vol +
-    m_osc4.get() * mOsc4Vol) / 4.0) * m_fCurrentEnvelopeVal * mVolume;
+
+  double osc1 = m_osc[0].get() + m_osc[1].get() + m_osc[2].get() + m_osc[3].get();
+  double osc2 = m_osc[4].get() + m_osc[5].get() + m_osc[6].get() + m_osc[7].get();
+  double osc3 = m_osc[8].get() + m_osc[9].get() + m_osc[10].get() + m_osc[11].get();
+  double osc4 = m_osc[12].get() + m_osc[13].get() + m_osc[14].get() + m_osc[15].get();
+
+  return ((osc1 * mOsc1Vol +
+    osc2 * mOsc2Vol +
+    osc3 * mOsc3Vol +
+    osc4 * mOsc4Vol) / 4.0) * m_fCurrentEnvelopeVal * mVolume;
+}
+
+double Synth::getLeft()
+{
+  return getMono();
 }
 
 double Synth::getRight()
 {
-  m_fCurrentEnvelopeVal = m_envelope.get();
-  return ((m_osc1.get() * mOsc1Vol +
-    m_osc2.get() * mOsc2Vol +
-    m_osc3.get() * mOsc3Vol +
-    m_osc4.get() * mOsc4Vol) / 4.0) * m_fCurrentEnvelopeVal * mVolume;
+  return getMono();
 }

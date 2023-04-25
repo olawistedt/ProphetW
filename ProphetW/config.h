@@ -5,8 +5,8 @@
 #define PLUG_UNIQUE_ID '07Iz'
 #define PLUG_MFR_ID 'Acme'
 #define PLUG_URL_STR "https://iplug2.github.io"
-#define PLUG_EMAIL_STR "spam@me.com"
-#define PLUG_COPYRIGHT_STR "Copyright 2021 Acme Inc"
+#define PLUG_EMAIL_STR "www.witech.se"
+#define PLUG_COPYRIGHT_STR "Copyright 2023 Witech"
 #define PLUG_CLASS_NAME ProphetW
 
 #define BUNDLE_NAME "ProphetW"
@@ -24,11 +24,11 @@
 #define PLUG_DOES_MPE 0
 #define PLUG_DOES_STATE_CHUNKS 0
 #define PLUG_HAS_UI 1
-#define PLUG_WIDTH 1024
-#define PLUG_HEIGHT 768
+#define PLUG_WIDTH 2000
+#define PLUG_HEIGHT 1000
 #define PLUG_FPS 60
 #define PLUG_SHARED_RESOURCES 0
-#define PLUG_HOST_RESIZE 1
+#define PLUG_HOST_RESIZE 0
 #define PLUG_MIN_WIDTH 256
 #define PLUG_MIN_HEIGHT 256
 #define PLUG_MAX_WIDTH 8192
@@ -58,6 +58,7 @@
 #define ROBOTO_FN "Roboto-Regular.ttf"
 
 #define BACKGROUND_FN "background.png"
-#define PNGENVELOP_FN "envelop.png"
+#define PNGKNBPROPHETBLACK_FN "knbProphetBlack-80x80.png"
+#define PNGKNBPROPHETSILVER_FN "knbProphetSilver-80x80.png"
 #define PNGOSC_FN "osc.png"
-#define PNGMOOG_FN "knbMoog.png"
+#define PNGBLACKLED_FN "btnBlackLed.png"

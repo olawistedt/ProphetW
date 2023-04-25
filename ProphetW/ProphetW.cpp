@@ -10,19 +10,21 @@ ProphetW::ProphetW(const InstanceInfo& info)
   : Plugin(info, MakeConfig(kNumParams, kNumPresets))
 {
   GetParam(kParamAttack)->InitDouble("Attack", 0., 0., 1000.0, 0.1, "msec");
-  GetParam(kParamDecay)->InitDouble("Decay", 1000., 0., 3000.0, 0.1, "msec");
+  GetParam(kParamDecay)->InitDouble("Decay", 3000., 0., 3000.0, 0.1, "msec");
   GetParam(kParamSustain)->InitDouble("Sustain", 0., 0., 1.0, 0.1, "%");
   GetParam(kParamRelease)->InitDouble("Release", 0., 0., 3000.0, 1.0, "msec");
 
-  GetParam(kParamOsc1)->InitInt("Osc1", 0, 0, 2, "wave1");
-  GetParam(kParamOsc2)->InitInt("Osc2", 0, 0, 2, "wave2");
-  GetParam(kParamOsc3)->InitInt("Osc3", 0, 0, 2, "wave3");
-  GetParam(kParamOsc4)->InitInt("Osc4", 0, 0, 2, "wave4");
+  for (int i = 0; i < 16; i++)
+  {
+    GetParam(kParamOsc0 + i)->InitBool(std::string("Osc" + std::to_string(i + 1)).c_str(), i == kParamOsc0 ? true : false);
+  }
 
-  GetParam(kParamOsc1Vol)->InitDouble("Osc1 Vol", 0., 0., 1.0, 0.1, "db");
-  GetParam(kParamOsc2Vol)->InitDouble("Osc2 Vol", 0., 0., 1.0, 0.1, "db");
-  GetParam(kParamOsc3Vol)->InitDouble("Osc3 Vol", 0., 0., 1.0, 0.1, "db");
-  GetParam(kParamOsc4Vol)->InitDouble("Osc4 Vol", 0., 0., 1.0, 0.1, "db");
+  for (int i = 0; i < 4; i++)
+  {
+    GetParam(kParamOsc0Vol + i)->InitDouble(std::string("Osc" + std::to_string(i + 1) + " Vol").c_str(), 1.0, 0., 1.0, 0.1, "db");
+  }
+
+  GetParam(kMainVolume)->InitDouble("Volume", 1.0, 0., 1.0, 0.1, "db");
 
 #if IPLUG_EDITOR // http://bit.ly/2S64BDd
   mMakeGraphicsFunc = [&]() {
@@ -30,53 +32,51 @@ ProphetW::ProphetW(const InstanceInfo& info)
   };
 
   mLayoutFunc = [&](IGraphics* pGraphics) {
-    const IBitmap knobLittleBitmap = pGraphics->LoadBitmap(PNGENVELOP_FN, 128);
-    const IBitmap knobOscBitmap = pGraphics->LoadBitmap(PNGOSC_FN, 3);
-    const IBitmap knobMoogBitmap = pGraphics->LoadBitmap(PNGMOOG_FN, 127);
-
-
-    const IRECT bounds = pGraphics->GetBounds();
-    const IRECT innerBounds = bounds.GetPadded(-200.f);
-    const IRECT sliderBoundsAttack = innerBounds.GetFromLeft(200).GetMidVPadded(100);
-    const IRECT sliderBoundsDecay = innerBounds.GetFromLeft(300).GetMidVPadded(100);
-    const IRECT sliderBoundsRelease = innerBounds.GetFromLeft(400).GetMidVPadded(100);
-    const IRECT sliderBoundsSustain = innerBounds.GetFromLeft(500).GetMidVPadded(100);
-    const IRECT versionBounds = innerBounds.GetFromTRHC(300, 20);
-    const IRECT titleBounds = innerBounds.GetCentredInside(200, 50);
-
+    const IBitmap knobLittleBitmap = pGraphics->LoadBitmap(PNGKNBPROPHETBLACK_FN, 127);
+    const IBitmap knobOscBitmap = pGraphics->LoadBitmap(PNGOSC_FN, 3, false);
+    const IBitmap knbProphetBlackBitmap = pGraphics->LoadBitmap(PNGKNBPROPHETBLACK_FN, 127);
+    const IBitmap knbProphetSilverBitmap = pGraphics->LoadBitmap(PNGKNBPROPHETSILVER_FN, 127);
+    const IBitmap btnProphetBlackBitmap = pGraphics->LoadBitmap(PNGBLACKLED_FN, 2);
 
     pGraphics->SetLayoutOnResize(true);
-    pGraphics->AttachCornerResizer(EUIResizerMode::Size, true);
+    pGraphics->AttachCornerResizer(EUIResizerMode::Scale, false);
     pGraphics->LoadFont("Roboto-Regular", ROBOTO_FN);
 
-    pGraphics->AttachPanelBackground(COLOR_LIGHT_GRAY);
-    //// Background
-    //pGraphics->LoadBitmap(BACKGROUND_FN, 1, true);
-    //pGraphics->AttachBackground(BACKGROUND_FN);
+    // Background
+    pGraphics->LoadBitmap(BACKGROUND_FN, 1, true);
+    pGraphics->AttachBackground(BACKGROUND_FN);
 
+    // Oscillator buttons
+    pGraphics->AttachControl(new IBSwitchControl(125, 122, btnProphetBlackBitmap, kParamOsc0));
+    pGraphics->AttachControl(new IBSwitchControl(155, 122, btnProphetBlackBitmap, kParamOsc0 + 1));
+    pGraphics->AttachControl(new IBSwitchControl(125, 170, btnProphetBlackBitmap, kParamOsc0 + 2));
+    pGraphics->AttachControl(new IBSwitchControl(155, 170, btnProphetBlackBitmap, kParamOsc0 + 3));
+    pGraphics->AttachControl(new IBSwitchControl(225, 122, btnProphetBlackBitmap, kParamOsc0 + 4));
+    pGraphics->AttachControl(new IBSwitchControl(255, 122, btnProphetBlackBitmap, kParamOsc0 + 5));
+    pGraphics->AttachControl(new IBSwitchControl(225, 170, btnProphetBlackBitmap, kParamOsc0 + 6));
+    pGraphics->AttachControl(new IBSwitchControl(255, 170, btnProphetBlackBitmap, kParamOsc0 + 7));
+    pGraphics->AttachControl(new IBSwitchControl(325, 122, btnProphetBlackBitmap, kParamOsc0 + 8));
+    pGraphics->AttachControl(new IBSwitchControl(355, 122, btnProphetBlackBitmap, kParamOsc0 + 9));
+    pGraphics->AttachControl(new IBSwitchControl(325, 170, btnProphetBlackBitmap, kParamOsc0 + 10));
+    pGraphics->AttachControl(new IBSwitchControl(355, 170, btnProphetBlackBitmap, kParamOsc0 + 11));
+    pGraphics->AttachControl(new IBSwitchControl(425, 122, btnProphetBlackBitmap, kParamOsc0 + 12));
+    pGraphics->AttachControl(new IBSwitchControl(455, 122, btnProphetBlackBitmap, kParamOsc0 + 13));
+    pGraphics->AttachControl(new IBSwitchControl(425, 170, btnProphetBlackBitmap, kParamOsc0 + 14));
+    pGraphics->AttachControl(new IBSwitchControl(455, 170, btnProphetBlackBitmap, kParamOsc0 + 15));
 
-    pGraphics->AttachControl(new IBKnobControl(510, 30, knobLittleBitmap, kParamAttack));
-    pGraphics->AttachControl(new IBKnobControl(610, 30, knobLittleBitmap, kParamDecay));
-    pGraphics->AttachControl(new IBKnobControl(710, 30, knobLittleBitmap, kParamSustain));
-    pGraphics->AttachControl(new IBKnobControl(810, 30, knobLittleBitmap, kParamRelease));
+    // Oscilator group volume
+    pGraphics->AttachControl(new IBKnobControl(110, 270, knbProphetBlackBitmap, kParamOsc0Vol));
+    pGraphics->AttachControl(new IBKnobControl(210, 270, knbProphetBlackBitmap, kParamOsc0Vol + 1));
+    pGraphics->AttachControl(new IBKnobControl(310, 270, knbProphetBlackBitmap, kParamOsc0Vol + 2));
+    pGraphics->AttachControl(new IBKnobControl(410, 270, knbProphetBlackBitmap, kParamOsc0Vol + 3));
 
+    pGraphics->AttachControl(new IBKnobControl(710, 160, knobLittleBitmap, kParamAttack));
+    pGraphics->AttachControl(new IBKnobControl(810, 160, knobLittleBitmap, kParamDecay));
+    pGraphics->AttachControl(new IBKnobControl(910, 160, knobLittleBitmap, kParamSustain));
+    pGraphics->AttachControl(new IBKnobControl(1010, 160, knobLittleBitmap, kParamRelease));
 
-    pGraphics->AttachControl(new IBKnobControl(110, 30, knobOscBitmap, kParamOsc1));
-    pGraphics->AttachControl(new IBKnobControl(210, 30, knobOscBitmap, kParamOsc2));
-    pGraphics->AttachControl(new IBKnobControl(310, 30, knobOscBitmap, kParamOsc3));
-    pGraphics->AttachControl(new IBKnobControl(410, 30, knobOscBitmap, kParamOsc4));
-
-    pGraphics->AttachControl(new IBKnobControl(110, 80, knobMoogBitmap, kParamOsc1Vol));
-    pGraphics->AttachControl(new IBKnobControl(210, 80, knobMoogBitmap, kParamOsc2Vol));
-    pGraphics->AttachControl(new IBKnobControl(310, 80, knobMoogBitmap, kParamOsc3Vol));
-    pGraphics->AttachControl(new IBKnobControl(410, 80, knobMoogBitmap, kParamOsc4Vol));
-
-
-
-    pGraphics->AttachControl(new ITextControl(titleBounds, "ProphetW", IText(30)), kCtrlTagTitle);
-    WDL_String buildInfoStr;
-    GetBuildInfoStr(buildInfoStr, __DATE__, __TIME__);
-    pGraphics->AttachControl(new ITextControl(versionBounds, buildInfoStr.Get(), DEFAULT_TEXT.WithAlign(EAlign::Far)), kCtrlTagVersionNumber);
+    // Master volume
+    pGraphics->AttachControl(new IBKnobControl(1500, 160, knbProphetSilverBitmap, kMainVolume));
 
 #if 1 // Show a keyboard or not
     //
@@ -107,20 +107,10 @@ ProphetW::ProphetW(const InstanceInfo& info)
 }
 
 #if IPLUG_EDITOR
-void ProphetW::OnParentWindowResize(int width, int height)
-{
-  if (GetUI())
-    GetUI()->Resize(width, height, 1.f, false);
-}
 
 void ProphetW::OnReset()
 {
   mSynth.setSampleRate(static_cast<long>(GetSampleRate()));
-  //mSynth.setWaveform(1, Oscilator::kSawTooth);
-  //mSynth.setWaveform(2, Oscilator::kSawTooth);
-  //mSynth.setWaveform(3, Oscilator::kSawTooth);
-  //mSynth.setWaveform(4, Oscilator::kSawTooth);
-  //  mSynth.NoteOn(40);
 }
 #endif
 
@@ -166,6 +156,16 @@ void ProphetW::OnParamChangeUI(int paramIdx, EParamSource source)
 
   double value = GetParam(paramIdx)->Value();
 
+  if (paramIdx >= kParamOsc0 && paramIdx <= kParamOsc0 + 15)
+  {
+    mSynth.m_osc[paramIdx - kParamOsc0].setIsOn(value == 1.0 ? true : false);
+  }
+
+  if (paramIdx >= kParamOsc0Vol && paramIdx <= kParamOsc0Vol + 3)
+  {
+    mSynth.setOscVol(paramIdx - kParamOsc0Vol, value);
+  }
+
   switch (paramIdx)
   {
   case kParamAttack:
@@ -180,31 +180,8 @@ void ProphetW::OnParamChangeUI(int paramIdx, EParamSource source)
   case kParamRelease:
     mSynth.setEnvelope(Envelope::kRelease, value);
     break;
-  case kParamOsc1:
-  case kParamOsc2:
-  case kParamOsc3:
-  case kParamOsc4:
-#ifdef _DEBUG
-    OutputDebugStringA(std::string("Waveform: " + std::to_string(value) + "\n").c_str());
-#endif // _DEBUG
-    if (value == 0.0)
-    {
-      mSynth.setWaveform(1 + paramIdx - kParamOsc1, Oscilator::kSquare);
-    }
-    else if (value == 1.0)
-    {
-      mSynth.setWaveform(1 + paramIdx - kParamOsc1, Oscilator::kSawTooth);
-    }
-    else if (value == 2.0)
-    {
-      mSynth.setWaveform(1 + paramIdx - kParamOsc1, Oscilator::kSine);
-    }
-    break;
-  case kParamOsc1Vol:
-  case kParamOsc2Vol:
-  case kParamOsc3Vol:
-  case kParamOsc4Vol:
-    mSynth.setOscVol(1 + paramIdx - kParamOsc1Vol, value);
+  case kMainVolume:
+    mSynth.setMasterVolume(value);
     break;
   }
 }

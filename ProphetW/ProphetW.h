@@ -11,14 +11,9 @@ enum EParams
   kParamAttack,
   kParamDecay,
   kParamSustain,
-  kParamOsc1,
-  kParamOsc2,
-  kParamOsc3,
-  kParamOsc4,
-  kParamOsc1Vol,
-  kParamOsc2Vol,
-  kParamOsc3Vol,
-  kParamOsc4Vol,
+  kParamOsc0,
+  kParamOsc0Vol = kParamOsc0 + 16,
+  kMainVolume = kParamOsc0Vol + 4,
   kNumParams
 };
 
@@ -43,7 +38,6 @@ public:
   ProphetW(const InstanceInfo& info);
 
 #if IPLUG_EDITOR
-  void OnParentWindowResize(int width, int height) override;
   bool OnHostRequestingSupportedViewConfiguration(int width, int height) override { return true; }
 #endif
   
