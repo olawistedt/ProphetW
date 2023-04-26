@@ -24,6 +24,11 @@ ProphetW::ProphetW(const InstanceInfo& info)
     GetParam(kParamOsc0Vol + i)->InitDouble(std::string("Osc" + std::to_string(i + 1) + " Vol").c_str(), 1.0, 0., 1.0, 0.1, "db");
   }
 
+  for (int i = 0; i < 4; i++)
+  {
+    GetParam(kParamOsc0Freq + i)->InitDouble(std::string("Osc" + std::to_string(i + 1) + " Freq").c_str(), 0.0, -24.0, +24.0, 1.0, "seminotes");
+  }
+
   GetParam(kMainVolume)->InitDouble("Volume", 1.0, 0., 1.0, 0.1, "db");
 
 #if IPLUG_EDITOR // http://bit.ly/2S64BDd
@@ -70,6 +75,13 @@ ProphetW::ProphetW(const InstanceInfo& info)
     pGraphics->AttachControl(new IBKnobControl(310, 270, knbProphetBlackBitmap, kParamOsc0Vol + 2));
     pGraphics->AttachControl(new IBKnobControl(410, 270, knbProphetBlackBitmap, kParamOsc0Vol + 3));
 
+    // Oscilator group frequency
+    pGraphics->AttachControl(new IBKnobControl(110, 370, knbProphetBlackBitmap, kParamOsc0Freq));
+    pGraphics->AttachControl(new IBKnobControl(210, 370, knbProphetBlackBitmap, kParamOsc0Freq + 1));
+    pGraphics->AttachControl(new IBKnobControl(310, 370, knbProphetBlackBitmap, kParamOsc0Freq + 2));
+    pGraphics->AttachControl(new IBKnobControl(410, 370, knbProphetBlackBitmap, kParamOsc0Freq + 3));
+
+    // Envelope
     pGraphics->AttachControl(new IBKnobControl(710, 160, knobLittleBitmap, kParamAttack));
     pGraphics->AttachControl(new IBKnobControl(810, 160, knobLittleBitmap, kParamDecay));
     pGraphics->AttachControl(new IBKnobControl(910, 160, knobLittleBitmap, kParamSustain));
@@ -164,6 +176,11 @@ void ProphetW::OnParamChangeUI(int paramIdx, EParamSource source)
   if (paramIdx >= kParamOsc0Vol && paramIdx <= kParamOsc0Vol + 3)
   {
     mSynth.setOscVol(paramIdx - kParamOsc0Vol, value);
+  }
+
+  if (paramIdx >= kParamOsc0Freq && paramIdx <= kParamOsc0Freq + 3)
+  {
+    mSynth.setOscFreq(paramIdx - kParamOsc0Freq, value);
   }
 
   switch (paramIdx)

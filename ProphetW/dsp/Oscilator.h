@@ -12,13 +12,14 @@ public:
   double         get();
   void           setSampleRate(unsigned long);
   void           setFreq(double);
+  void           noteOn();
   void           setWaveform(unsigned char ucWaveform);
   void           setPulseWidth(double fPulseWidthInPercent);
   void           setOsc(int oscNr, int value);
   void           setVolume(double volume); // The  volume of the combinded oscilators.
   void           setIsOn(bool isOn) { m_bIsOn = isOn; }
   bool           getIsOn() { return m_bIsOn; }
-  unsigned short period(double* values);
+//  unsigned short period(double* values);
 #ifdef __LOG_FILE__
   void           period2logfile();
 #endif

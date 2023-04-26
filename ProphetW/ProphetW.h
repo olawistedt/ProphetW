@@ -13,7 +13,8 @@ enum EParams
   kParamSustain,
   kParamOsc0,
   kParamOsc0Vol = kParamOsc0 + 16,
-  kMainVolume = kParamOsc0Vol + 4,
+  kParamOsc0Freq = kParamOsc0Vol + 4,
+  kMainVolume = kParamOsc0Freq + 4,
   kNumParams
 };
 

@@ -26,7 +26,7 @@ double Oscilator::get()
   {
     return 0.0;
   }
-  if (m_usCurrent == m_usPeriodLength)
+  if (m_usCurrent >= m_usPeriodLength)
     m_usCurrent = 0; // Start new period.
   m_usCurrent++;
 
@@ -84,6 +84,10 @@ void Oscilator::setFreq(double fFreq)
   m_dFreq = fFreq;
   m_usPeriodLength = (unsigned short)(m_ulSampleRate / m_dFreq);
   setPulseWidth(m_dPulseWidthInPercent);
+}
+
+void Oscilator::noteOn()
+{
   m_usCurrent = 0;
 }
 
@@ -100,15 +104,15 @@ void Oscilator::setPulseWidth(double fPulseWidthInPercent)
   m_usPulseWidth = (unsigned short)(m_usPeriodLength * m_dPulseWidthInPercent);
 }
 
-// Fill the values array with the period values and return the period lenght.
-unsigned short Oscilator::period(double* values)
-{
-  unsigned short usBackupCurrent = m_usCurrent;
-  m_usCurrent = 0;
-  for (int i = 0; i < m_usPeriodLength; i++)
-  {
-    values[i] = get();
-  }
-  m_usCurrent = usBackupCurrent;
-  return m_usPeriodLength;
-}
+//// Fill the values array with the period values and return the period lenght.
+//unsigned short Oscilator::period(double* values)
+//{
+//  unsigned short usBackupCurrent = m_usCurrent;
+//  m_usCurrent = 0;
+//  for (int i = 0; i < m_usPeriodLength; i++)
+//  {
+//    values[i] = get();
+//  }
+//  m_usCurrent = usBackupCurrent;
+//  return m_usPeriodLength;
+//}

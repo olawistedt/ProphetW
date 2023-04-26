@@ -52,6 +52,19 @@ void Synth::setOscVol(int oscNr, double vol)
   }
 }
 
+void Synth::setOscFreq(int oscNr, double freq)
+{
+  switch (oscNr)
+  {
+  case 0: mOsc1Freq = static_cast<int>(freq); break;
+  case 1: mOsc2Freq = static_cast<int>(freq); break;
+  case 2: mOsc3Freq = static_cast<int>(freq); break;
+  case 3: mOsc4Freq = static_cast<int>(freq); break;
+  default: throw "Unknown oscilator";
+  }
+}
+
+
 void Synth::setEnvelope(Envelope::type parameter, double value)
 {
   switch (parameter)
@@ -76,9 +89,11 @@ void Synth::setSampleRate(long sampleRate)
 
 void Synth::NoteOn(unsigned char ucNote)
 {
+  m_ucNote = ucNote;
+
   for (int i = 0; i < 16; i++)
   {
-    m_osc[i].setFreq(m_note2freq[ucNote]);
+    m_osc[i].noteOn();
   }
 
   m_envelope.restart();
@@ -93,17 +108,59 @@ static double m_fCurrentEnvelopeVal;
 
 double Synth::getMono()
 {
-  m_fCurrentEnvelopeVal = m_envelope.get();
+  int osc1Note = m_ucNote + mOsc1Freq;
+  int osc2Note = m_ucNote + mOsc2Freq;
+  int osc3Note = m_ucNote + mOsc3Freq;
+  int osc4Note = m_ucNote + mOsc4Freq;
+
+  if (osc1Note < 0 || osc1Note >= 128)
+  {
+    osc1Note = m_ucNote;
+  }
+  if (osc2Note < 0 || osc2Note >= 128)
+  {
+    osc2Note = m_ucNote;
+  }
+  if (osc3Note < 0 || osc3Note >= 128)
+  {
+    osc3Note = m_ucNote;
+  }
+  if (osc4Note < 0 || osc4Note >= 128)
+  {
+    osc4Note = m_ucNote;
+  }
+  m_osc[0].setFreq(m_note2freq[osc1Note]);
+  m_osc[1].setFreq(m_note2freq[osc1Note]);
+  m_osc[2].setFreq(m_note2freq[osc1Note]);
+  m_osc[3].setFreq(m_note2freq[osc1Note]);
+
+  m_osc[4].setFreq(m_note2freq[osc2Note]);
+  m_osc[5].setFreq(m_note2freq[osc2Note]);
+  m_osc[6].setFreq(m_note2freq[osc2Note]);
+  m_osc[7].setFreq(m_note2freq[osc2Note]);
+
+  m_osc[8].setFreq(m_note2freq[osc3Note]);
+  m_osc[9].setFreq(m_note2freq[osc3Note]);
+  m_osc[10].setFreq(m_note2freq[osc3Note]);
+  m_osc[11].setFreq(m_note2freq[osc3Note]);
+
+  m_osc[12].setFreq(m_note2freq[osc4Note]);
+  m_osc[13].setFreq(m_note2freq[osc4Note]);
+  m_osc[14].setFreq(m_note2freq[osc4Note]);
+  m_osc[15].setFreq(m_note2freq[osc4Note]);
+
 
   double osc1 = m_osc[0].get() + m_osc[1].get() + m_osc[2].get() + m_osc[3].get();
   double osc2 = m_osc[4].get() + m_osc[5].get() + m_osc[6].get() + m_osc[7].get();
   double osc3 = m_osc[8].get() + m_osc[9].get() + m_osc[10].get() + m_osc[11].get();
   double osc4 = m_osc[12].get() + m_osc[13].get() + m_osc[14].get() + m_osc[15].get();
 
+  double fCurrentEnvelopeVal = m_envelope.get();
+
   return ((osc1 * mOsc1Vol +
     osc2 * mOsc2Vol +
     osc3 * mOsc3Vol +
-    osc4 * mOsc4Vol) / 4.0) * m_fCurrentEnvelopeVal * mVolume;
+    osc4 * mOsc4Vol) / 4.0) * fCurrentEnvelopeVal * mVolume;
 }
 
 double Synth::getLeft()
