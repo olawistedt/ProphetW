@@ -1,4 +1,8 @@
 #include "Synth.h"
+#ifdef _WIN32
+#include <windows.h> // for OutputDebugString
+#endif
+#include <string>
 
 Synth::Synth()
 {
@@ -33,7 +37,7 @@ Synth::Synth()
   a *= k;                     // b
   a *= k;                     // bb
   a *= k;                     // c, frequency of midi note 0
-  for (int i = 0; i < 128; i++) // 128 midi notes
+  for (int i = 0; i < 140; i++) // 140 midi notes
   {
     m_note2freq[i] = (double)a;
     a *= k;
@@ -64,6 +68,19 @@ void Synth::setOscFreq(int oscNr, double freq)
   }
 }
 
+void Synth::setOscFine(int oscNr, double freq)
+{
+  switch (oscNr)
+  {
+  case 0: mOsc1Fine = freq;
+//    OutputDebugStringA(std::string("mOsc1Fine = " + std::to_string(mOsc1Fine) + "\n").c_str());
+    break;
+  case 1: mOsc2Fine = freq; break;
+  case 2: mOsc3Fine = freq; break;
+  case 3: mOsc4Fine = freq; break;
+  default: throw "Unknown oscilator";
+  }
+}
 
 void Synth::setEnvelope(Envelope::type parameter, double value)
 {
@@ -113,41 +130,47 @@ double Synth::getMono()
   int osc3Note = m_ucNote + mOsc3Freq;
   int osc4Note = m_ucNote + mOsc4Freq;
 
-  if (osc1Note < 0 || osc1Note >= 128)
+  if (osc1Note < 1 || osc1Note >= 138)
   {
     osc1Note = m_ucNote;
   }
-  if (osc2Note < 0 || osc2Note >= 128)
+  if (osc2Note < 1 || osc2Note >= 138)
   {
     osc2Note = m_ucNote;
   }
-  if (osc3Note < 0 || osc3Note >= 128)
+  if (osc3Note < 1 || osc3Note >= 138)
   {
     osc3Note = m_ucNote;
   }
-  if (osc4Note < 0 || osc4Note >= 128)
+  if (osc4Note < 1 || osc4Note >= 138)
   {
     osc4Note = m_ucNote;
   }
-  m_osc[0].setFreq(m_note2freq[osc1Note]);
-  m_osc[1].setFreq(m_note2freq[osc1Note]);
-  m_osc[2].setFreq(m_note2freq[osc1Note]);
-  m_osc[3].setFreq(m_note2freq[osc1Note]);
 
-  m_osc[4].setFreq(m_note2freq[osc2Note]);
-  m_osc[5].setFreq(m_note2freq[osc2Note]);
-  m_osc[6].setFreq(m_note2freq[osc2Note]);
-  m_osc[7].setFreq(m_note2freq[osc2Note]);
+  double osc1Fine = mOsc1Fine < 0 ? mOsc1Fine * (m_note2freq[osc1Note] - m_note2freq[osc1Note - 1]) : mOsc1Fine * (m_note2freq[osc1Note + 1] - m_note2freq[osc1Note]);
+  double osc2Fine = mOsc2Fine < 0 ? mOsc2Fine * (m_note2freq[osc2Note] - m_note2freq[osc2Note - 1]) : mOsc2Fine * (m_note2freq[osc2Note + 1] - m_note2freq[osc2Note]);
+  double osc3Fine = mOsc3Fine < 0 ? mOsc3Fine * (m_note2freq[osc3Note] - m_note2freq[osc3Note - 1]) : mOsc3Fine * (m_note2freq[osc3Note + 1] - m_note2freq[osc3Note]);
+  double osc4Fine = mOsc4Fine < 0 ? mOsc4Fine * (m_note2freq[osc4Note] - m_note2freq[osc4Note - 1]) : mOsc4Fine * (m_note2freq[osc4Note + 1] - m_note2freq[osc4Note]);
 
-  m_osc[8].setFreq(m_note2freq[osc3Note]);
-  m_osc[9].setFreq(m_note2freq[osc3Note]);
-  m_osc[10].setFreq(m_note2freq[osc3Note]);
-  m_osc[11].setFreq(m_note2freq[osc3Note]);
+  m_osc[0].setFreq(m_note2freq[osc1Note] + osc1Fine);
+  m_osc[1].setFreq(m_note2freq[osc1Note] + osc1Fine);
+  m_osc[2].setFreq(m_note2freq[osc1Note] + osc1Fine);
+  m_osc[3].setFreq(m_note2freq[osc1Note] + osc1Fine);
 
-  m_osc[12].setFreq(m_note2freq[osc4Note]);
-  m_osc[13].setFreq(m_note2freq[osc4Note]);
-  m_osc[14].setFreq(m_note2freq[osc4Note]);
-  m_osc[15].setFreq(m_note2freq[osc4Note]);
+  m_osc[4].setFreq(m_note2freq[osc2Note] + osc2Fine);
+  m_osc[5].setFreq(m_note2freq[osc2Note] + osc2Fine);
+  m_osc[6].setFreq(m_note2freq[osc2Note] + osc2Fine);
+  m_osc[7].setFreq(m_note2freq[osc2Note] + osc2Fine);
+
+  m_osc[8].setFreq(m_note2freq[osc3Note] + osc3Fine);
+  m_osc[9].setFreq(m_note2freq[osc3Note] + osc3Fine);
+  m_osc[10].setFreq(m_note2freq[osc3Note] + osc3Fine);
+  m_osc[11].setFreq(m_note2freq[osc3Note] + osc3Fine);
+
+  m_osc[12].setFreq(m_note2freq[osc4Note] + osc4Fine);
+  m_osc[13].setFreq(m_note2freq[osc4Note] + osc4Fine);
+  m_osc[14].setFreq(m_note2freq[osc4Note] + osc4Fine);
+  m_osc[15].setFreq(m_note2freq[osc4Note] + osc4Fine);
 
 
   double osc1 = m_osc[0].get() + m_osc[1].get() + m_osc[2].get() + m_osc[3].get();

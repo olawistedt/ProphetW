@@ -16,6 +16,7 @@ public:
   void NoteOff(unsigned char ucNote);
   void setOscVol(int oscNr, double vol);
   void setOscFreq(int oscNr, double freq);
+  void setOscFine(int oscNr, double freq);
   void setEnvelope(Envelope::type parameter, double value);
   void setMasterVolume(double volume) { mVolume = volume; }
 
@@ -32,6 +33,10 @@ private:
   int mOsc2Freq;
   int mOsc3Freq;
   int mOsc4Freq;
+  double mOsc1Fine;
+  double mOsc2Fine;
+  double mOsc3Fine;
+  double mOsc4Fine;
   Envelope  m_envelope;
   double mVolume;
 };

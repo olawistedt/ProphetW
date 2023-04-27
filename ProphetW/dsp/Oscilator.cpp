@@ -83,6 +83,8 @@ void Oscilator::setFreq(double fFreq)
 {
   m_dFreq = fFreq;
   m_usPeriodLength = (unsigned short)(m_ulSampleRate / m_dFreq);
+  //   m_usPeriodLength = static_cast<unsigned short>((static_cast<double>(m_ulSampleRate) / m_dFreq));
+
   setPulseWidth(m_dPulseWidthInPercent);
 }
 

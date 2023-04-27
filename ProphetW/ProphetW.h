@@ -7,15 +7,16 @@ const int kNumPresets = 1;
 
 enum EParams
 {
-  kParamRelease = 0,
+  kMainVolume = 0,
+  kParamRelease,
   kParamAttack,
   kParamDecay,
   kParamSustain,
   kParamOsc0,
   kParamOsc0Vol = kParamOsc0 + 16,
   kParamOsc0Freq = kParamOsc0Vol + 4,
-  kMainVolume = kParamOsc0Freq + 4,
-  kNumParams
+  kParamOsc0Fine = kParamOsc0Freq + 4,
+  kNumParams = kParamOsc0Fine + 4
 };
 
 enum ECtrlTags
