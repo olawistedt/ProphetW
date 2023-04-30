@@ -12,7 +12,7 @@ public:
   double getLeft();
   double getRight();
   void setSampleRate(long sampleRate);
-  void NoteOn (unsigned char ucNote);
+  void NoteOn(unsigned char ucNote);
   void NoteOff(unsigned char ucNote);
   void setOscVol(int oscNr, double vol);
   void setOscFreq(int oscNr, double freq);
@@ -37,8 +37,8 @@ private:
   double mOsc2Fine;
   double mOsc3Fine;
   double mOsc4Fine;
-  Envelope  m_envelope;
+  Envelope m_envelope;
   double mVolume;
 };
 
-#endif // __SYNTH_H__
+#endif  // __SYNTH_H__

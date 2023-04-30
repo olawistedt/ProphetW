@@ -37,22 +37,22 @@ using namespace igraphics;
 class ProphetW final : public Plugin
 {
 public:
-  ProphetW(const InstanceInfo& info);
+  ProphetW(const InstanceInfo &info);
 
 #if IPLUG_EDITOR
   bool OnHostRequestingSupportedViewConfiguration(int width, int height) override { return true; }
 #endif
-  
-#if IPLUG_DSP // http://bit.ly/2S64BDd
-  void ProcessBlock(sample** inputs, sample** outputs, int nFrames) override;
+
+#if IPLUG_DSP  // http://bit.ly/2S64BDd
+  void ProcessBlock(sample **inputs, sample **outputs, int nFrames) override;
   void OnReset() override;
-  void ProcessMidiMsg(const IMidiMsg& msg) override;
-//  void OnParamChange(int paramIdx) override;
+  void ProcessMidiMsg(const IMidiMsg &msg) override;
+  //  void OnParamChange(int paramIdx) override;
   void OnParamChangeUI(int paramIdx, EParamSource source = kUnknown) override;
 
   Synth mSynth;
+
 protected:
   IMidiQueue mMidiQueue;
 #endif
-
 };

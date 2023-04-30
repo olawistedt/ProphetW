@@ -3,17 +3,17 @@
 
 class Envelope
 {
- public:
+public:
   Envelope();
 
-  void  setSampleRate(unsigned long ulNewSampleRate);
-  double get               (); 
-  void  restart           ();
-  void  beginReleasePhase ();
-  void  setAttack         (double fMsec);
-  void  setDecay          (double fMsec);
-  void  setSustain        (double fLevel);
-  void  setRelease        (double fMsec);
+  void setSampleRate(unsigned long ulNewSampleRate);
+  double get();
+  void restart();
+  void beginReleasePhase();
+  void setAttack(double fMsec);
+  void setDecay(double fMsec);
+  void setSustain(double fLevel);
+  void setRelease(double fMsec);
 
   enum type
   {
@@ -24,7 +24,7 @@ class Envelope
     kNumEnvelopes
   };
 
- private:
+private:
   enum
   {
     kIdle,
@@ -34,12 +34,12 @@ class Envelope
     kReleasePhase,
   };
 
-  double        m_fAttack;
-  double        m_fDecay;
-  double        m_fSustain;
-  double        m_fRelease;
+  double m_fAttack;
+  double m_fDecay;
+  double m_fSustain;
+  double m_fRelease;
   unsigned long m_ulSampleRate;
-  double        m_fMsecsBetweenSamples;
+  double m_fMsecsBetweenSamples;
   unsigned long m_ulCurrent;
   unsigned long m_ulAttackEnds;
   unsigned long m_ulDecayEnds;
@@ -47,4 +47,4 @@ class Envelope
   unsigned char m_ucInPhase;
 };
 
-#endif // __ENVELOPE_H__
+#endif  // __ENVELOPE_H__

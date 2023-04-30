@@ -6,8 +6,7 @@
 #include "IControls.h"
 #endif
 
-ProphetW::ProphetW(const InstanceInfo& info)
-  : Plugin(info, MakeConfig(kNumParams, kNumPresets))
+ProphetW::ProphetW(const InstanceInfo &info) : Plugin(info, MakeConfig(kNumParams, kNumPresets))
 {
   GetParam(kParamAttack)->InitDouble("Attack", 0., 0., 1000.0, 0.1, "msec");
   GetParam(kParamDecay)->InitDouble("Decay", 3000., 0., 3000.0, 0.1, "msec");
@@ -16,32 +15,51 @@ ProphetW::ProphetW(const InstanceInfo& info)
 
   for (int i = 0; i < 16; i++)
   {
-    GetParam(kParamOsc0 + i)->InitBool(std::string("Osc" + std::to_string(i + 1)).c_str(), i == kParamOsc0 ? true : false);
+    GetParam(kParamOsc0 + i)
+        ->InitBool(std::string("Osc" + std::to_string(i + 1)).c_str(),
+                   i == kParamOsc0 ? true : false);
   }
 
   for (int i = 0; i < 4; i++)
   {
-    GetParam(kParamOsc0Vol + i)->InitDouble(std::string("Osc" + std::to_string(i + 1) + " Vol").c_str(), 1.0, 0., 1.0, 0.1, "db");
+    GetParam(kParamOsc0Vol + i)
+        ->InitDouble(std::string("Osc" + std::to_string(i + 1) + " Vol").c_str(),
+                     1.0,
+                     0.,
+                     1.0,
+                     0.1,
+                     "db");
   }
 
   for (int i = 0; i < 4; i++)
   {
-    GetParam(kParamOsc0Freq + i)->InitDouble(std::string("Osc" + std::to_string(i + 1) + " Freq").c_str(), 0.0, -24.0, +24.0, 1.0, "seminotes");
+    GetParam(kParamOsc0Freq + i)
+        ->InitDouble(std::string("Osc" + std::to_string(i + 1) + " Freq").c_str(),
+                     0.0,
+                     -24.0,
+                     +24.0,
+                     1.0,
+                     "seminotes");
   }
 
   for (int i = 0; i < 4; i++)
   {
-    GetParam(kParamOsc0Fine + i)->InitDouble(std::string("Osc" + std::to_string(i + 1) + " Fine").c_str(), 0.0, -1.0, +1.0, 0.01, "hz");
+    GetParam(kParamOsc0Fine + i)
+        ->InitDouble(std::string("Osc" + std::to_string(i + 1) + " Fine").c_str(),
+                     0.0,
+                     -1.0,
+                     +1.0,
+                     0.01,
+                     "hz");
   }
 
   GetParam(kMainVolume)->InitDouble("Volume", 1.0, 0., 1.0, 0.1, "db");
 
-#if IPLUG_EDITOR // http://bit.ly/2S64BDd
-  mMakeGraphicsFunc = [&]() {
-    return MakeGraphics(*this, PLUG_WIDTH, PLUG_HEIGHT, PLUG_FPS);
-  };
+#if IPLUG_EDITOR  // http://bit.ly/2S64BDd
+  mMakeGraphicsFunc = [&]() { return MakeGraphics(*this, PLUG_WIDTH, PLUG_HEIGHT, PLUG_FPS); };
 
-  mLayoutFunc = [&](IGraphics* pGraphics) {
+  mLayoutFunc = [&](IGraphics *pGraphics)
+  {
     const IBitmap knobLittleBitmap = pGraphics->LoadBitmap(PNGKNBPROPHETBLACK_FN, 127);
     const IBitmap knobOscBitmap = pGraphics->LoadBitmap(PNGOSC_FN, 3, false);
     const IBitmap knbProphetBlackBitmap = pGraphics->LoadBitmap(PNGKNBPROPHETBLACK_FN, 127);
@@ -82,15 +100,21 @@ ProphetW::ProphetW(const InstanceInfo& info)
 
     // Oscilator group frequency
     pGraphics->AttachControl(new IBKnobControl(110, 370, knbProphetBlackBitmap, kParamOsc0Freq));
-    pGraphics->AttachControl(new IBKnobControl(210, 370, knbProphetBlackBitmap, kParamOsc0Freq + 1));
-    pGraphics->AttachControl(new IBKnobControl(310, 370, knbProphetBlackBitmap, kParamOsc0Freq + 2));
-    pGraphics->AttachControl(new IBKnobControl(410, 370, knbProphetBlackBitmap, kParamOsc0Freq + 3));
+    pGraphics->AttachControl(
+        new IBKnobControl(210, 370, knbProphetBlackBitmap, kParamOsc0Freq + 1));
+    pGraphics->AttachControl(
+        new IBKnobControl(310, 370, knbProphetBlackBitmap, kParamOsc0Freq + 2));
+    pGraphics->AttachControl(
+        new IBKnobControl(410, 370, knbProphetBlackBitmap, kParamOsc0Freq + 3));
 
     // Oscilator group fine
     pGraphics->AttachControl(new IBKnobControl(110, 470, knbProphetBlackBitmap, kParamOsc0Fine));
-    pGraphics->AttachControl(new IBKnobControl(210, 470, knbProphetBlackBitmap, kParamOsc0Fine + 1));
-    pGraphics->AttachControl(new IBKnobControl(310, 470, knbProphetBlackBitmap, kParamOsc0Fine + 2));
-    pGraphics->AttachControl(new IBKnobControl(410, 470, knbProphetBlackBitmap, kParamOsc0Fine + 3));
+    pGraphics->AttachControl(
+        new IBKnobControl(210, 470, knbProphetBlackBitmap, kParamOsc0Fine + 1));
+    pGraphics->AttachControl(
+        new IBKnobControl(310, 470, knbProphetBlackBitmap, kParamOsc0Fine + 2));
+    pGraphics->AttachControl(
+        new IBKnobControl(410, 470, knbProphetBlackBitmap, kParamOsc0Fine + 3));
 
     // Envelope
     pGraphics->AttachControl(new IBKnobControl(710, 160, knobLittleBitmap, kParamAttack));
@@ -101,7 +125,7 @@ ProphetW::ProphetW(const InstanceInfo& info)
     // Master volume
     pGraphics->AttachControl(new IBKnobControl(1500, 160, knbProphetSilverBitmap, kMainVolume));
 
-#if 1 // Show a keyboard or not
+#if 1  // Show a keyboard or not
     //
     // Keyboard begins
     //
@@ -111,27 +135,33 @@ ProphetW::ProphetW(const InstanceInfo& info)
     IRECT wheelsBounds = keyboardBounds.ReduceFromLeft(100.f).GetPadded(-10.f);
 
     pGraphics->AttachControl(new IVKeyboardControl(keyboardBounds), kCtrlTagKeyboard);
-    pGraphics->AttachControl(new IVButtonControl(keyboardBounds.GetFromTRHC(200, 30).GetTranslated(0, -30), SplashClickActionFunc,
-      "Show/Hide Keyboard", DEFAULT_STYLE.WithColor(kFG, COLOR_WHITE).WithLabelText({ 15.f, EVAlign::Middle })))->SetAnimationEndActionFunction(
-        [pGraphics](IControl* pCaller) {
-          static bool hide = false;
-          pGraphics->GetControlWithTag(kCtrlTagKeyboard)->Hide(hide = !hide);
-          pGraphics->Resize(PLUG_WIDTH, hide ? PLUG_HEIGHT / 2 : PLUG_HEIGHT, pGraphics->GetDrawScale());
-        });
+    pGraphics
+        ->AttachControl(new IVButtonControl(
+            keyboardBounds.GetFromTRHC(200, 30).GetTranslated(0, -30),
+            SplashClickActionFunc,
+            "Show/Hide Keyboard",
+            DEFAULT_STYLE.WithColor(kFG, COLOR_WHITE).WithLabelText({ 15.f, EVAlign::Middle })))
+        ->SetAnimationEndActionFunction(
+            [pGraphics](IControl *pCaller)
+            {
+              static bool hide = false;
+              pGraphics->GetControlWithTag(kCtrlTagKeyboard)->Hide(hide = !hide);
+              pGraphics->Resize(PLUG_WIDTH,
+                                hide ? PLUG_HEIGHT / 2 : PLUG_HEIGHT,
+                                pGraphics->GetDrawScale());
+            });
     //
     // Keyboard ends
     //
-#endif // Show a keyboard or not
-
-
-
+#endif  // Show a keyboard or not
   };
 #endif
 }
 
 #if IPLUG_DSP
 
-void ProphetW::OnReset()
+void
+ProphetW::OnReset()
 {
   mSynth.setSampleRate(static_cast<long>(GetSampleRate()));
 }
@@ -139,10 +169,12 @@ void ProphetW::OnReset()
 
 
 #if IPLUG_DSP
-void ProphetW::ProcessBlock(sample** inputs, sample** outputs, int nFrames)
+void
+ProphetW::ProcessBlock(sample **inputs, sample **outputs, int nFrames)
 {
   // Channel declaration.
-  PLUG_SAMPLE_DST* out01 = outputs[0];  PLUG_SAMPLE_DST* out02 = outputs[1];
+  PLUG_SAMPLE_DST *out01 = outputs[0];
+  PLUG_SAMPLE_DST *out02 = outputs[1];
 
   for (int s = 0; s < nFrames; s++)
   {
@@ -164,13 +196,15 @@ void ProphetW::ProcessBlock(sample** inputs, sample** outputs, int nFrames)
   }
 }
 
-void ProphetW::ProcessMidiMsg(const IMidiMsg& msg)
+void
+ProphetW::ProcessMidiMsg(const IMidiMsg &msg)
 {
   TRACE;
-  mMidiQueue.Add(msg); // Take care of MIDI events in ProcessBlock()
+  mMidiQueue.Add(msg);  // Take care of MIDI events in ProcessBlock()
 }
 //void ProphetW::OnParamChange(int paramIdx)
-void ProphetW::OnParamChangeUI(int paramIdx, EParamSource source)
+void
+ProphetW::OnParamChangeUI(int paramIdx, EParamSource source)
 {
   //if (source != kUI)
   //{
@@ -178,6 +212,10 @@ void ProphetW::OnParamChangeUI(int paramIdx, EParamSource source)
   //}
 
   double value = GetParam(paramIdx)->Value();
+
+  OutputDebugStringA(std::string("paramIdx = " + std::to_string(paramIdx) + "\n").c_str());
+  OutputDebugStringA(std::string("value = " + std::to_string(value) + "\n").c_str());
+
 
   if (paramIdx >= kParamOsc0 && paramIdx <= kParamOsc0 + 15)
   {
@@ -201,21 +239,11 @@ void ProphetW::OnParamChangeUI(int paramIdx, EParamSource source)
 
   switch (paramIdx)
   {
-  case kParamAttack:
-    mSynth.setEnvelope(Envelope::kAttack, value);
-    break;
-  case kParamDecay:
-    mSynth.setEnvelope(Envelope::kDecay, value);
-    break;
-  case kParamSustain:
-    mSynth.setEnvelope(Envelope::kSustain, value);
-    break;
-  case kParamRelease:
-    mSynth.setEnvelope(Envelope::kRelease, value);
-    break;
-  case kMainVolume:
-    mSynth.setMasterVolume(value);
-    break;
+    case kParamAttack: mSynth.setEnvelope(Envelope::kAttack, value); break;
+    case kParamDecay: mSynth.setEnvelope(Envelope::kDecay, value); break;
+    case kParamSustain: mSynth.setEnvelope(Envelope::kSustain, value); break;
+    case kParamRelease: mSynth.setEnvelope(Envelope::kRelease, value); break;
+    case kMainVolume: mSynth.setMasterVolume(value); break;
   }
 }
 
