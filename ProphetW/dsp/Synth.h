@@ -20,7 +20,7 @@ public:
   void setEnvelope(Envelope::type parameter, double value);
   void setMasterVolume(double volume) { mVolume = volume; }
 
-  double m_note2freq[128];
+  double m_note2freq[140];
   Oscilator m_osc[16];
 
 private:

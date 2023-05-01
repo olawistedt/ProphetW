@@ -37,7 +37,7 @@ Oscilator::get()
     case kSawTooth: return getSawTooth();
     case kTriangle: return getTriangle();
     case kSine: return getSine();
-    default: return getSquare();
+    default: throw("No such waveform");
   }
 }
 
@@ -78,7 +78,7 @@ void
 Oscilator::setSampleRate(unsigned long ulSampleRate)
 {
   m_ulSampleRate = ulSampleRate;
-  m_usPeriodLength = (unsigned short)(m_ulSampleRate / m_dFreq);
+  m_usPeriodLength = static_cast<unsigned short>(m_ulSampleRate / m_dFreq);
   setPulseWidth(m_dPulseWidthInPercent);
 }
 
@@ -86,9 +86,7 @@ void
 Oscilator::setFreq(double fFreq)
 {
   m_dFreq = fFreq;
-  m_usPeriodLength = (unsigned short)(m_ulSampleRate / m_dFreq);
-  //   m_usPeriodLength = static_cast<unsigned short>((static_cast<double>(m_ulSampleRate) / m_dFreq));
-
+  m_usPeriodLength = static_cast<unsigned short>(m_ulSampleRate / m_dFreq);
   setPulseWidth(m_dPulseWidthInPercent);
 }
 
@@ -112,16 +110,3 @@ Oscilator::setPulseWidth(double fPulseWidthInPercent)
   m_dPulseWidthInPercent = fPulseWidthInPercent;
   m_usPulseWidth = (unsigned short)(m_usPeriodLength * m_dPulseWidthInPercent);
 }
-
-//// Fill the values array with the period values and return the period lenght.
-//unsigned short Oscilator::period(double* values)
-//{
-//  unsigned short usBackupCurrent = m_usCurrent;
-//  m_usCurrent = 0;
-//  for (int i = 0; i < m_usPeriodLength; i++)
-//  {
-//    values[i] = get();
-//  }
-//  m_usCurrent = usBackupCurrent;
-//  return m_usPeriodLength;
-//}
