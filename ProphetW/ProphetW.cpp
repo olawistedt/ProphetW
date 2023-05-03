@@ -8,6 +8,11 @@
 
 ProphetW::ProphetW(const InstanceInfo &info) : Plugin(info, MakeConfig(kNumParams, kNumPresets))
 {
+  for (int i = 0; i < 10; i++)
+  {
+    mVoices[i] = -1;
+  }
+
   GetParam(kParamAttack)->InitDouble("Attack", 0., 0., 1000.0, 0.1, "msec");
   GetParam(kParamDecay)->InitDouble("Decay", 3000., 0., 3000.0, 0.1, "msec");
   GetParam(kParamSustain)->InitDouble("Sustain", 0., 0., 1.0, 0.1, "%");
@@ -187,7 +192,10 @@ ProphetW::ProphetW(const InstanceInfo &info) : Plugin(info, MakeConfig(kNumParam
 void
 ProphetW::OnReset()
 {
-  mSynth.setSampleRate(static_cast<long>(GetSampleRate()));
+  for (int i = 0; i < 10; ++i)
+  {
+    mSynth[i].setSampleRate(static_cast<long>(GetSampleRate()));
+  }
 }
 #endif
 
@@ -207,16 +215,48 @@ ProphetW::ProcessBlock(sample **inputs, sample **outputs, int nFrames)
       IMidiMsg msg = mMidiQueue.Peek();
       if (msg.StatusMsg() == IMidiMsg::kNoteOn)
       {
-        mSynth.NoteOn(msg.NoteNumber());
+        assert(msg.NoteNumber() != 0);
+        short useVoice = -1;
+        // Allocate a voice for the note.
+        for (int i = 0; i < 10; ++i)
+        {
+          if (mVoices[i] == -1)
+          {
+            useVoice = i;
+            mVoices[i] = msg.NoteNumber();
+            break;
+          }
+        }
+        if (useVoice != -1)
+        {
+          mSynth[useVoice].NoteOn(msg.NoteNumber());
+        }
       }
       else if (msg.StatusMsg() == IMidiMsg::kNoteOff)
       {
-        mSynth.NoteOff(msg.NoteNumber());
+        short unUseVoice;
+        for (int i = 0; i < 10; ++i)
+        {
+          if (mVoices[i] == msg.NoteNumber())
+          {
+            unUseVoice = i;
+            mVoices[i] = -1;
+            break;
+          }
+        }
+        mSynth[unUseVoice].NoteOff(msg.NoteNumber());
       }
       mMidiQueue.Remove();
     }
-    *out01++ = mSynth.getLeft();
-    *out02++ = mSynth.getRight();
+    double allLeft = 0.0;
+    double allRight = 0.0;
+    for (int i = 0; i < 10; ++i)
+    {
+      allLeft += mSynth[i].getLeft();
+      allRight += mSynth[i].getRight();
+    }
+    *out01++ = allLeft;
+    *out02++ = allRight;
   }
 }
 
@@ -243,36 +283,76 @@ ProphetW::OnParamChangeUI(int paramIdx, EParamSource source)
 
   if (paramIdx >= kParamOsc0 && paramIdx <= kParamOsc0 + 15)
   {
-    mSynth.m_osc[paramIdx - kParamOsc0].setIsOn(value == 1.0 ? true : false);
+    for (int i = 0; i < 10; ++i)
+    {
+      mSynth[i].m_osc[paramIdx - kParamOsc0].setIsOn(value == 1.0 ? true : false);
+    }
   }
 
   if (paramIdx >= kParamOsc0Vol && paramIdx <= kParamOsc0Vol + 3)
   {
-    mSynth.setOscVol(paramIdx - kParamOsc0Vol, value);
+    for (int i = 0; i < 10; ++i)
+    {
+      mSynth[i].setOscVol(paramIdx - kParamOsc0Vol, value);
+    }
   }
 
   if (paramIdx >= kParamOsc0Freq && paramIdx <= kParamOsc0Freq + 3)
   {
-    mSynth.setOscFreq(paramIdx - kParamOsc0Freq, value);
+    for (int i = 0; i < 10; ++i)
+    {
+      mSynth[i].setOscFreq(paramIdx - kParamOsc0Freq, value);
+    }
   }
 
   if (paramIdx >= kParamOsc0Fine && paramIdx <= kParamOsc0Fine + 3)
   {
-    mSynth.setOscFine(paramIdx - kParamOsc0Fine, value);
+    for (int i = 0; i < 10; ++i)
+    {
+      mSynth[i].setOscFine(paramIdx - kParamOsc0Fine, value);
+    }
   }
 
   if (paramIdx >= kParamOsc0PulseWidth && paramIdx <= kParamOsc0PulseWidth + 3)
   {
-    mSynth.setOscPulseWidth(paramIdx - kParamOsc0PulseWidth, value);
+    for (int i = 0; i < 10; ++i)
+    {
+      mSynth[i].setOscPulseWidth(paramIdx - kParamOsc0PulseWidth, value);
+    }
   }
 
   switch (paramIdx)
   {
-    case kParamAttack: mSynth.setEnvelope(Envelope::kAttack, value); break;
-    case kParamDecay: mSynth.setEnvelope(Envelope::kDecay, value); break;
-    case kParamSustain: mSynth.setEnvelope(Envelope::kSustain, value); break;
-    case kParamRelease: mSynth.setEnvelope(Envelope::kRelease, value); break;
-    case kMainVolume: mSynth.setMasterVolume(value); break;
+    case kParamAttack:
+      for (int i = 0; i < 10; ++i)
+      {
+        mSynth[i].setEnvelope(Envelope::kAttack, value);
+      }
+      break;
+    case kParamDecay:
+      for (int i = 0; i < 10; ++i)
+      {
+        mSynth[i].setEnvelope(Envelope::kDecay, value);
+      }
+      break;
+    case kParamSustain:
+      for (int i = 0; i < 10; ++i)
+      {
+        mSynth[i].setEnvelope(Envelope::kSustain, value);
+      }
+      break;
+    case kParamRelease:
+      for (int i = 0; i < 10; ++i)
+      {
+        mSynth[i].setEnvelope(Envelope::kRelease, value);
+      }
+      break;
+    case kMainVolume:
+      for (int i = 0; i < 10; ++i)
+      {
+        mSynth[i].setMasterVolume(value);
+      }
+      break;
   }
 }
 

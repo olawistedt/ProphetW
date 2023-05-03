@@ -51,7 +51,8 @@ public:
   //  void OnParamChange(int paramIdx) override;
   void OnParamChangeUI(int paramIdx, EParamSource source = kUnknown) override;
 
-  Synth mSynth;
+  Synth mSynth[10];  // 10 voices
+  short mVoices[10];
 
 protected:
   IMidiQueue mMidiQueue;
