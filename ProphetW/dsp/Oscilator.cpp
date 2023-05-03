@@ -8,7 +8,7 @@
 // Oscilator
 //-----------------------------------------------------------------------------------------
 
-Oscilator::Oscilator()
+Oscilator::Oscilator() : m_bIsOn(false)
 {
   m_ulSampleRate = 96000;
   m_dFreq = 440.0;
@@ -23,22 +23,27 @@ Oscilator::Oscilator()
 double
 Oscilator::get()
 {
-  if (!m_bIsOn)
+  if (!m_bIsOn)  // m_bIsOn is set by the GUI.
   {
     return 0.0;
   }
-  if (m_usCurrent >= m_usPeriodLength)
-    m_usCurrent = 0;  // Start new period.
+
   m_usCurrent++;
 
+  if (m_usCurrent >= m_usPeriodLength)
+    m_usCurrent = 0;  // Start new period.
+
+  double dValue;
   switch (m_ucWaveform)
   {
-    case kSquare: return getSquare();
-    case kSawTooth: return getSawTooth();
-    case kTriangle: return getTriangle();
-    case kSine: return getSine();
+    case kSquare: dValue = getSquare(); break;
+    case kSawTooth: dValue = getSawTooth(); break;
+    case kTriangle: dValue = getTriangle(); break;
+    case kSine: dValue = getSine(); break;
     default: throw("No such waveform");
   }
+
+  return dValue;
 }
 
 double

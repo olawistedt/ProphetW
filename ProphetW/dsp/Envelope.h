@@ -10,10 +10,10 @@ public:
   double get();
   void restart();
   void beginReleasePhase();
-  void setAttack(double fMsec);
-  void setDecay(double fMsec);
-  void setSustain(double fLevel);
-  void setRelease(double fMsec);
+  void setAttack(double dMsec);
+  void setDecay(double dMsec);
+  void setSustain(double dLevel);
+  void setRelease(double dMsec);
 
   enum type
   {

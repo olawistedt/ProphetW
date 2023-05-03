@@ -53,6 +53,20 @@ ProphetW::ProphetW(const InstanceInfo &info) : Plugin(info, MakeConfig(kNumParam
                      "hz");
   }
 
+  for (int i = 0; i < 4; i++)
+  {
+  }
+  for (int i = 0; i < 4; i++)
+  {
+    GetParam(kParamOsc0PulseWidth + i)
+        ->InitDouble(std::string("Osc" + std::to_string(i + 1) + " Pulse Width").c_str(),
+                     0.5,
+                     0.,
+                     1.0,
+                     0.01,
+                     "%");
+  }
+
   GetParam(kMainVolume)->InitDouble("Volume", 1.0, 0., 1.0, 0.1, "db");
 
 #if IPLUG_EDITOR  // http://bit.ly/2S64BDd
@@ -116,6 +130,16 @@ ProphetW::ProphetW(const InstanceInfo &info) : Plugin(info, MakeConfig(kNumParam
     pGraphics->AttachControl(
         new IBKnobControl(410, 470, knbProphetBlackBitmap, kParamOsc0Fine + 3));
 
+    // Oscilator group pulse width
+    pGraphics->AttachControl(
+        new IBKnobControl(110, 570, knbProphetBlackBitmap, kParamOsc0PulseWidth));
+    pGraphics->AttachControl(
+        new IBKnobControl(210, 570, knbProphetBlackBitmap, kParamOsc0PulseWidth + 1));
+    pGraphics->AttachControl(
+        new IBKnobControl(310, 570, knbProphetBlackBitmap, kParamOsc0PulseWidth + 2));
+    pGraphics->AttachControl(
+        new IBKnobControl(410, 570, knbProphetBlackBitmap, kParamOsc0PulseWidth + 3));
+
     // Envelope
     pGraphics->AttachControl(new IBKnobControl(710, 160, knobLittleBitmap, kParamAttack));
     pGraphics->AttachControl(new IBKnobControl(810, 160, knobLittleBitmap, kParamDecay));
@@ -125,7 +149,7 @@ ProphetW::ProphetW(const InstanceInfo &info) : Plugin(info, MakeConfig(kNumParam
     // Master volume
     pGraphics->AttachControl(new IBKnobControl(1500, 160, knbProphetSilverBitmap, kMainVolume));
 
-#if 1  // Show a keyboard or not
+#if 0   // Show a keyboard or not
     //
     // Keyboard begins
     //
@@ -235,6 +259,11 @@ ProphetW::OnParamChangeUI(int paramIdx, EParamSource source)
   if (paramIdx >= kParamOsc0Fine && paramIdx <= kParamOsc0Fine + 3)
   {
     mSynth.setOscFine(paramIdx - kParamOsc0Fine, value);
+  }
+
+  if (paramIdx >= kParamOsc0PulseWidth && paramIdx <= kParamOsc0PulseWidth + 3)
+  {
+    mSynth.setOscPulseWidth(paramIdx - kParamOsc0PulseWidth, value);
   }
 
   switch (paramIdx)

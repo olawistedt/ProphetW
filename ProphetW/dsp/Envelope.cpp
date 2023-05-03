@@ -21,8 +21,8 @@ Envelope::Envelope()
 {
   m_ucInPhase = kIdle;
 
-  m_fAttack = 100;  // Msek
-  m_fDecay = 100;   // Msek
+  m_fAttack = 100;    // Msek
+  m_fDecay = 100;     // Msek
   m_fSustain = 0.5;
   m_fRelease = 1000;  // Msek
 }
@@ -49,21 +49,21 @@ Envelope::setSampleRate(unsigned long ulNewSampleRate)
   setRelease(m_fRelease);
 }
 void
-Envelope::setAttack(double fMsec)
+Envelope::setAttack(double dMsec)
 {
-  m_fAttack = fMsec;
+  m_fAttack = dMsec;
   m_ulAttackEnds = (long)(m_fAttack / m_fMsecsBetweenSamples);
 }
 void
-Envelope::setDecay(double fMsec)
+Envelope::setDecay(double dMsec)
 {
-  m_fDecay = fMsec;
+  m_fDecay = dMsec;
   m_ulDecayEnds = (long)(m_fDecay / m_fMsecsBetweenSamples);
 }
 void
-Envelope::setSustain(double fLevel)
+Envelope::setSustain(double dLevel)
 {
-  m_fSustain = fLevel;
+  m_fSustain = dLevel;
 }
 void
 Envelope::setRelease(double fMsec)
@@ -76,7 +76,7 @@ Envelope::get()
 {
   //  static bool ba,bd,bs,br = false;
 
-  double fRet = 1.0;
+  double dRet = 1.0;
 
   static bool isBypassEnvelope = false;
   if (isBypassEnvelope)
@@ -97,7 +97,7 @@ Envelope::get()
     }
     else
     {
-      fRet = ((double)m_ulCurrent) * m_fMsecsBetweenSamples * 1.0f / m_fAttack;
+      dRet = ((double)m_ulCurrent) * m_fMsecsBetweenSamples * 1.0f / m_fAttack;
       m_ulCurrent++;
     }
   }
@@ -110,13 +110,13 @@ Envelope::get()
     }
     else
     {
-      fRet = 1.0f - ((double)m_ulCurrent) * m_fMsecsBetweenSamples * (1.0f - m_fSustain) / m_fDecay;
+      dRet = 1.0f - ((double)m_ulCurrent) * m_fMsecsBetweenSamples * (1.0f - m_fSustain) / m_fDecay;
       m_ulCurrent++;
     }
   }
   if (m_ucInPhase == kSustainPhase)
   {
-    fRet = m_fSustain;
+    dRet = m_fSustain;
   }
   if (m_ucInPhase == kReleasePhase)
   {
@@ -127,13 +127,13 @@ Envelope::get()
     }
     else
     {
-      fRet = m_fSustain - ((double)m_ulCurrent) * m_fMsecsBetweenSamples * m_fSustain / m_fRelease;
+      dRet = m_fSustain - ((double)m_ulCurrent) * m_fMsecsBetweenSamples * m_fSustain / m_fRelease;
       m_ulCurrent++;
     }
   }
   if (m_ucInPhase == kIdle)
   {
-    fRet = 0.0;
+    dRet = 0.0;
   }
-  return fRet;
+  return dRet;
 }

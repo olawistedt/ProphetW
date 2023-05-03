@@ -17,6 +17,7 @@ public:
   void setOscVol(int oscNr, double vol);
   void setOscFreq(int oscNr, double freq);
   void setOscFine(int oscNr, double freq);
+  void setOscPulseWidth(int oscNr, double pulseWidth);
   void setEnvelope(Envelope::type parameter, double value);
   void setMasterVolume(double volume) { mVolume = volume; }
 
@@ -37,6 +38,10 @@ private:
   double mOsc2Fine;
   double mOsc3Fine;
   double mOsc4Fine;
+  double mOsc1PulseWidth;
+  double mOsc2PulseWidth;
+  double mOsc3PulseWidth;
+  double mOsc4PulseWidth;
   Envelope m_envelope;
   double mVolume;
 };

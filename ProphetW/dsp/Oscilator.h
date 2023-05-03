@@ -13,6 +13,7 @@ public:
   void setSampleRate(unsigned long);
   void setFreq(double);
   void noteOn();
+  void noteOff();
   void setWaveform(unsigned char ucWaveform);
   void setPulseWidth(double fPulseWidthInPercent);
   void setOsc(int oscNr, int value);

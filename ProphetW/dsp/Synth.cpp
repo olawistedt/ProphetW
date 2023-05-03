@@ -87,6 +87,19 @@ Synth::setOscFine(int oscNr, double freq)
 }
 
 void
+Synth::setOscPulseWidth(int oscNr, double pulseWidth)
+{
+  switch (oscNr)
+  {
+    case 0: mOsc1PulseWidth = pulseWidth; break;
+    case 1: mOsc2PulseWidth = pulseWidth; break;
+    case 2: mOsc3PulseWidth = pulseWidth; break;
+    case 3: mOsc4PulseWidth = pulseWidth; break;
+    default: throw "Unknown oscilator";
+  }
+}
+
+void
 Synth::setEnvelope(Envelope::type parameter, double value)
 {
   switch (parameter)
@@ -126,6 +139,10 @@ Synth::NoteOn(unsigned char ucNote)
 void
 Synth::NoteOff(unsigned char ucNote)
 {
+  //for (int i = 0; i < 16; i++)
+  //{
+  //  m_osc[i].noteOff();
+  //}
   m_envelope.beginReleasePhase();
 }
 
@@ -189,6 +206,26 @@ Synth::getMono()
   m_osc[14].setFreq(m_note2freq[osc4Note] + osc4Fine);
   m_osc[15].setFreq(m_note2freq[osc4Note] + osc4Fine);
 
+  m_osc[0].setPulseWidth(mOsc1PulseWidth);
+  m_osc[1].setPulseWidth(mOsc1PulseWidth);
+  m_osc[2].setPulseWidth(mOsc1PulseWidth);
+  m_osc[3].setPulseWidth(mOsc1PulseWidth);
+
+  m_osc[4].setPulseWidth(mOsc2PulseWidth);
+  m_osc[5].setPulseWidth(mOsc2PulseWidth);
+  m_osc[6].setPulseWidth(mOsc2PulseWidth);
+  m_osc[7].setPulseWidth(mOsc2PulseWidth);
+
+  m_osc[8].setPulseWidth(mOsc3PulseWidth);
+  m_osc[9].setPulseWidth(mOsc3PulseWidth);
+  m_osc[10].setPulseWidth(mOsc3PulseWidth);
+  m_osc[11].setPulseWidth(mOsc3PulseWidth);
+
+  m_osc[12].setPulseWidth(mOsc4PulseWidth);
+  m_osc[13].setPulseWidth(mOsc4PulseWidth);
+  m_osc[14].setPulseWidth(mOsc4PulseWidth);
+  m_osc[15].setPulseWidth(mOsc4PulseWidth);
+
   double osc1divider = (m_osc[0].getIsOn() ? 1 : 0) + (m_osc[1].getIsOn() ? 1 : 0) +
                        (m_osc[2].getIsOn() ? 1 : 0) + (m_osc[3].getIsOn() ? 1 : 0);
   double osc2divider = (m_osc[4].getIsOn() ? 1 : 0) + (m_osc[5].getIsOn() ? 1 : 0) +
@@ -205,7 +242,8 @@ Synth::getMono()
   double osc1 = (m_osc[0].get() + m_osc[1].get() + m_osc[2].get() + m_osc[3].get()) / osc1divider;
   double osc2 = (m_osc[4].get() + m_osc[5].get() + m_osc[6].get() + m_osc[7].get()) / osc2divider;
   double osc3 = (m_osc[8].get() + m_osc[9].get() + m_osc[10].get() + m_osc[11].get()) / osc3divider;
-  double osc4 = (m_osc[12].get() + m_osc[13].get() + m_osc[14].get() + m_osc[15].get()) / osc4divider;
+  double osc4 =
+      (m_osc[12].get() + m_osc[13].get() + m_osc[14].get() + m_osc[15].get()) / osc4divider;
 
   double fCurrentEnvelopeVal = m_envelope.get();
 

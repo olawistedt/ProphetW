@@ -16,7 +16,8 @@ enum EParams
   kParamOsc0Vol = kParamOsc0 + 16,
   kParamOsc0Freq = kParamOsc0Vol + 4,
   kParamOsc0Fine = kParamOsc0Freq + 4,
-  kNumParams = kParamOsc0Fine + 4
+  kParamOsc0PulseWidth = kParamOsc0Fine + 4,
+  kNumParams = kParamOsc0PulseWidth + 4
 };
 
 enum ECtrlTags
