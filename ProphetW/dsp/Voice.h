@@ -1,13 +1,13 @@
-#ifndef __SYNTH_H__
-#define __SYNTH_H__
+#ifndef __VOICE_H__
+#define __VOICE_H__
 
 #include "Oscilator.h"
 #include "Envelope.h"
 
-class Synth
+class Voice
 {
 public:
-  Synth();
+  Voice();
   double getMono();
   double getLeft();
   double getRight();
@@ -19,6 +19,8 @@ public:
   void setOscFine(int oscNr, double freq);
   void setOscPulseWidth(int oscNr, double pulseWidth);
   void setEnvelope(Envelope::type parameter, double value);
+  void setCutOff(double value);
+  void setResonance(double value);
   void setMasterVolume(double volume) { mVolume = volume; }
 
   double m_note2freq[140];
@@ -46,4 +48,4 @@ private:
   double mVolume;
 };
 
-#endif  // __SYNTH_H__
+#endif  // __VOICE_H__

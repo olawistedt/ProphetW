@@ -1,4 +1,5 @@
 #include "Oscilator.h"
+#include "Filter.h"
 
 #define _USE_MATH_DEFINES  // To get M_PI
 #include <math.h>
@@ -43,6 +44,9 @@ Oscilator::get()
     default: throw("No such waveform");
   }
 
+  //  dValue = m_filter.lowPassFilter12db(dValue, m_dCutOff, m_ulSampleRate);
+  dValue = m_moogFilter.process(dValue);
+
   return dValue;
 }
 
@@ -75,7 +79,8 @@ Oscilator::getSawTooth()
 double
 Oscilator::getSine()
 {
-  return sin(2.0 * M_PI * ((double)m_usCurrent) / ((double)m_usPeriodLength));
+  double dValue = sin(2.0 * M_PI * ((double)m_usCurrent) / ((double)m_usPeriodLength));
+  return dValue;
 }
 
 
@@ -85,6 +90,20 @@ Oscilator::setSampleRate(unsigned long ulSampleRate)
   m_ulSampleRate = ulSampleRate;
   m_usPeriodLength = static_cast<unsigned short>(m_ulSampleRate / m_dFreq);
   setPulseWidth(m_dPulseWidthInPercent);
+}
+
+void
+Oscilator::setCutOff(double cutOff)
+{
+  m_dCutOff = cutOff;
+  m_moogFilter.setCutoff(m_dCutOff);
+}
+
+void
+Oscilator::setResonance(double res)
+{
+  m_dRes = res;
+  m_moogFilter.setRes(m_dRes);
 }
 
 void
@@ -98,7 +117,7 @@ Oscilator::setFreq(double fFreq)
 void
 Oscilator::noteOn()
 {
-  m_usCurrent = 0;
+  //  m_usCurrent = 0;
 }
 
 void

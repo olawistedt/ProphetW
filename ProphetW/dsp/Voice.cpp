@@ -1,10 +1,10 @@
-#include "Synth.h"
+#include "Voice.h"
 #ifdef _WIN32
 #include <windows.h>  // for OutputDebugString
 #endif
 #include <string>
 
-Synth::Synth() : m_ucNote(0)
+Voice::Voice() : m_ucNote(0)
 {
   for (int i = 0; i < 16; i++)
   {
@@ -45,7 +45,7 @@ Synth::Synth() : m_ucNote(0)
 }
 
 void
-Synth::setOscVol(int oscNr, double vol)
+Voice::setOscVol(int oscNr, double vol)
 {
   switch (oscNr)
   {
@@ -58,7 +58,7 @@ Synth::setOscVol(int oscNr, double vol)
 }
 
 void
-Synth::setOscFreq(int oscNr, double freq)
+Voice::setOscFreq(int oscNr, double freq)
 {
   switch (oscNr)
   {
@@ -71,7 +71,7 @@ Synth::setOscFreq(int oscNr, double freq)
 }
 
 void
-Synth::setOscFine(int oscNr, double freq)
+Voice::setOscFine(int oscNr, double freq)
 {
   switch (oscNr)
   {
@@ -87,7 +87,7 @@ Synth::setOscFine(int oscNr, double freq)
 }
 
 void
-Synth::setOscPulseWidth(int oscNr, double pulseWidth)
+Voice::setOscPulseWidth(int oscNr, double pulseWidth)
 {
   switch (oscNr)
   {
@@ -100,7 +100,7 @@ Synth::setOscPulseWidth(int oscNr, double pulseWidth)
 }
 
 void
-Synth::setEnvelope(Envelope::type parameter, double value)
+Voice::setEnvelope(Envelope::type parameter, double value)
 {
   switch (parameter)
   {
@@ -113,7 +113,7 @@ Synth::setEnvelope(Envelope::type parameter, double value)
 }
 
 void
-Synth::setSampleRate(long sampleRate)
+Voice::setSampleRate(long sampleRate)
 {
   for (int i = 0; i < 16; i++)
   {
@@ -124,20 +124,38 @@ Synth::setSampleRate(long sampleRate)
 }
 
 void
-Synth::NoteOn(unsigned char ucNote)
+Voice::setCutOff(double cutOff)
+{
+  for (int i = 0; i < 16; i++)
+  {
+    m_osc[i].setCutOff(cutOff);
+  }
+}
+
+void
+Voice::setResonance(double resonance)
+{
+  for (int i = 0; i < 16; i++)
+  {
+    m_osc[i].setResonance(resonance);
+  }
+}
+
+void
+Voice::NoteOn(unsigned char ucNote)
 {
   m_ucNote = ucNote;
 
-  for (int i = 0; i < 16; i++)
-  {
-    m_osc[i].noteOn();
-  }
+  //for (int i = 0; i < 16; i++)
+  //{
+  //  m_osc[i].noteOn();
+  //}
 
   m_envelope.restart();
 }
 
 void
-Synth::NoteOff(unsigned char ucNote)
+Voice::NoteOff(unsigned char ucNote)
 {
   //for (int i = 0; i < 16; i++)
   //{
@@ -149,7 +167,7 @@ Synth::NoteOff(unsigned char ucNote)
 static double m_fCurrentEnvelopeVal;
 
 double
-Synth::getMono()
+Voice::getMono()
 {
   int osc1Note = m_ucNote + mOsc1Freq;
   int osc2Note = m_ucNote + mOsc2Freq;
@@ -252,13 +270,13 @@ Synth::getMono()
 }
 
 double
-Synth::getLeft()
+Voice::getLeft()
 {
   return getMono();
 }
 
 double
-Synth::getRight()
+Voice::getRight()
 {
   return getMono();
 }

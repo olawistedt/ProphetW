@@ -1,9 +1,11 @@
 #pragma once
 
 #include "IPlug_include_in_plug_hdr.h"
-#include "dsp/Synth.h"
+#include "dsp/Voice.h"
 
 const int kNumPresets = 1;
+const int NUMBER_OF_VOICES = 20;
+
 
 enum EParams
 {
@@ -17,7 +19,9 @@ enum EParams
   kParamOsc0Freq = kParamOsc0Vol + 4,
   kParamOsc0Fine = kParamOsc0Freq + 4,
   kParamOsc0PulseWidth = kParamOsc0Fine + 4,
-  kNumParams = kParamOsc0PulseWidth + 4
+  kParamFilterCutoff = kParamOsc0PulseWidth + 4,
+  kParamFilterResonance,
+  kNumParams
 };
 
 enum ECtrlTags
@@ -51,7 +55,7 @@ public:
   //  void OnParamChange(int paramIdx) override;
   void OnParamChangeUI(int paramIdx, EParamSource source = kUnknown) override;
 
-  Synth mSynth[10];  // 10 voices
+  Voice mVoice[10];  // 10 voices
   short mVoices[10];
 
 protected:

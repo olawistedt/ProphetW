@@ -329,7 +329,7 @@
     <ClInclude Include="..\dsp\Envelope.h" />
     <ClInclude Include="..\dsp\Filter.h" />
     <ClInclude Include="..\dsp\Oscilator.h" />
-    <ClInclude Include="..\dsp\Synth.h" />
+    <ClInclude Include="..\dsp\Voice.h" />
     <ClInclude Include="..\ProphetW.h" />
     <ClInclude Include="..\resources\resource.h" />
   </ItemGroup>
@@ -395,7 +395,7 @@
     <ClCompile Include="..\dsp\Envelope.cpp" />
     <ClCompile Include="..\dsp\Filter.cpp" />
     <ClCompile Include="..\dsp\Oscilator.cpp" />
-    <ClCompile Include="..\dsp\Synth.cpp" />
+    <ClCompile Include="..\dsp\Voice.cpp" />
     <ClCompile Include="..\ProphetW.cpp" />
   </ItemGroup>
   <ItemGroup>

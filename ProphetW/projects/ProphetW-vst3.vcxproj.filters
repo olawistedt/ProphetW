@@ -143,7 +143,7 @@
     <ClCompile Include="..\dsp\Oscilator.cpp">
       <Filter>dsp</Filter>
     </ClCompile>
-    <ClCompile Include="..\dsp\Synth.cpp">
+    <ClCompile Include="..\dsp\Voice.cpp">
       <Filter>dsp</Filter>
     </ClCompile>
   </ItemGroup>
@@ -378,7 +378,7 @@
     <ClInclude Include="..\dsp\Oscilator.h">
       <Filter>dsp</Filter>
     </ClInclude>
-    <ClInclude Include="..\dsp\Synth.h">
+    <ClInclude Include="..\dsp\Voice.h">
       <Filter>dsp</Filter>
     </ClInclude>
   </ItemGroup>

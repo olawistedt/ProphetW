@@ -8,7 +8,7 @@
 
 ProphetW::ProphetW(const InstanceInfo &info) : Plugin(info, MakeConfig(kNumParams, kNumPresets))
 {
-  for (int i = 0; i < 10; i++)
+  for (int i = 0; i < NUMBER_OF_VOICES; i++)
   {
     mVoices[i] = -1;
   }
@@ -72,6 +72,9 @@ ProphetW::ProphetW(const InstanceInfo &info) : Plugin(info, MakeConfig(kNumParam
                      "%");
   }
 
+  GetParam(kParamFilterCutoff)->InitDouble("Filter Cutoff", 500.0, 0., 500.0, 1.0, "hz");
+  GetParam(kParamFilterResonance)->InitDouble("Filter Resonance", 0.0, 0.0, 2.0, 0.01, "hz");
+
   GetParam(kMainVolume)->InitDouble("Volume", 1.0, 0., 1.0, 0.1, "db");
 
 #if IPLUG_EDITOR  // http://bit.ly/2S64BDd
@@ -112,10 +115,10 @@ ProphetW::ProphetW(const InstanceInfo &info) : Plugin(info, MakeConfig(kNumParam
     pGraphics->AttachControl(new IBSwitchControl(455, 170, btnProphetBlackBitmap, kParamOsc0 + 15));
 
     // Oscilator group volume
-    pGraphics->AttachControl(new IBKnobControl(110, 270, knbProphetBlackBitmap, kParamOsc0Vol));
-    pGraphics->AttachControl(new IBKnobControl(210, 270, knbProphetBlackBitmap, kParamOsc0Vol + 1));
-    pGraphics->AttachControl(new IBKnobControl(310, 270, knbProphetBlackBitmap, kParamOsc0Vol + 2));
-    pGraphics->AttachControl(new IBKnobControl(410, 270, knbProphetBlackBitmap, kParamOsc0Vol + 3));
+    pGraphics->AttachControl(new IBKnobControl(110, 260, knbProphetBlackBitmap, kParamOsc0Vol));
+    pGraphics->AttachControl(new IBKnobControl(210, 260, knbProphetBlackBitmap, kParamOsc0Vol + 1));
+    pGraphics->AttachControl(new IBKnobControl(310, 260, knbProphetBlackBitmap, kParamOsc0Vol + 2));
+    pGraphics->AttachControl(new IBKnobControl(410, 260, knbProphetBlackBitmap, kParamOsc0Vol + 3));
 
     // Oscilator group frequency
     pGraphics->AttachControl(new IBKnobControl(110, 370, knbProphetBlackBitmap, kParamOsc0Freq));
@@ -127,32 +130,37 @@ ProphetW::ProphetW(const InstanceInfo &info) : Plugin(info, MakeConfig(kNumParam
         new IBKnobControl(410, 370, knbProphetBlackBitmap, kParamOsc0Freq + 3));
 
     // Oscilator group fine
-    pGraphics->AttachControl(new IBKnobControl(110, 470, knbProphetBlackBitmap, kParamOsc0Fine));
+    pGraphics->AttachControl(new IBKnobControl(110, 480, knbProphetBlackBitmap, kParamOsc0Fine));
     pGraphics->AttachControl(
-        new IBKnobControl(210, 470, knbProphetBlackBitmap, kParamOsc0Fine + 1));
+        new IBKnobControl(210, 480, knbProphetBlackBitmap, kParamOsc0Fine + 1));
     pGraphics->AttachControl(
-        new IBKnobControl(310, 470, knbProphetBlackBitmap, kParamOsc0Fine + 2));
+        new IBKnobControl(310, 480, knbProphetBlackBitmap, kParamOsc0Fine + 2));
     pGraphics->AttachControl(
-        new IBKnobControl(410, 470, knbProphetBlackBitmap, kParamOsc0Fine + 3));
+        new IBKnobControl(410, 480, knbProphetBlackBitmap, kParamOsc0Fine + 3));
 
     // Oscilator group pulse width
     pGraphics->AttachControl(
-        new IBKnobControl(110, 570, knbProphetBlackBitmap, kParamOsc0PulseWidth));
+        new IBKnobControl(110, 600, knbProphetBlackBitmap, kParamOsc0PulseWidth));
     pGraphics->AttachControl(
-        new IBKnobControl(210, 570, knbProphetBlackBitmap, kParamOsc0PulseWidth + 1));
+        new IBKnobControl(210, 600, knbProphetBlackBitmap, kParamOsc0PulseWidth + 1));
     pGraphics->AttachControl(
-        new IBKnobControl(310, 570, knbProphetBlackBitmap, kParamOsc0PulseWidth + 2));
+        new IBKnobControl(310, 600, knbProphetBlackBitmap, kParamOsc0PulseWidth + 2));
     pGraphics->AttachControl(
-        new IBKnobControl(410, 570, knbProphetBlackBitmap, kParamOsc0PulseWidth + 3));
+        new IBKnobControl(410, 600, knbProphetBlackBitmap, kParamOsc0PulseWidth + 3));
 
-    // Envelope
-    pGraphics->AttachControl(new IBKnobControl(710, 160, knobLittleBitmap, kParamAttack));
-    pGraphics->AttachControl(new IBKnobControl(810, 160, knobLittleBitmap, kParamDecay));
-    pGraphics->AttachControl(new IBKnobControl(910, 160, knobLittleBitmap, kParamSustain));
-    pGraphics->AttachControl(new IBKnobControl(1010, 160, knobLittleBitmap, kParamRelease));
+    // Filter
+    pGraphics->AttachControl(new IBKnobControl(710, 160, knobLittleBitmap, kParamFilterCutoff));
+    pGraphics->AttachControl(new IBKnobControl(810, 160, knobLittleBitmap, kParamFilterResonance));
+
+    // Amplifier Envelope
+    pGraphics->AttachControl(new IBKnobControl(1160, 160, knobLittleBitmap, kParamAttack));
+    pGraphics->AttachControl(new IBKnobControl(1260, 160, knobLittleBitmap, kParamDecay));
+    pGraphics->AttachControl(new IBKnobControl(1360, 160, knobLittleBitmap, kParamSustain));
+    pGraphics->AttachControl(new IBKnobControl(1460, 160, knobLittleBitmap, kParamRelease));
+
 
     // Master volume
-    pGraphics->AttachControl(new IBKnobControl(1500, 160, knbProphetSilverBitmap, kMainVolume));
+    pGraphics->AttachControl(new IBKnobControl(1700, 160, knbProphetSilverBitmap, kMainVolume));
 
 #if 0   // Show a keyboard or not
     //
@@ -192,9 +200,9 @@ ProphetW::ProphetW(const InstanceInfo &info) : Plugin(info, MakeConfig(kNumParam
 void
 ProphetW::OnReset()
 {
-  for (int i = 0; i < 10; ++i)
+  for (int i = 0; i < NUMBER_OF_VOICES; ++i)
   {
-    mSynth[i].setSampleRate(static_cast<long>(GetSampleRate()));
+    mVoice[i].setSampleRate(static_cast<long>(GetSampleRate()));
   }
 }
 #endif
@@ -215,10 +223,9 @@ ProphetW::ProcessBlock(sample **inputs, sample **outputs, int nFrames)
       IMidiMsg msg = mMidiQueue.Peek();
       if (msg.StatusMsg() == IMidiMsg::kNoteOn)
       {
-        assert(msg.NoteNumber() != 0);
         short useVoice = -1;
         // Allocate a voice for the note.
-        for (int i = 0; i < 10; ++i)
+        for (int i = 0; i < NUMBER_OF_VOICES; ++i)
         {
           if (mVoices[i] == -1)
           {
@@ -229,13 +236,13 @@ ProphetW::ProcessBlock(sample **inputs, sample **outputs, int nFrames)
         }
         if (useVoice != -1)
         {
-          mSynth[useVoice].NoteOn(msg.NoteNumber());
+          mVoice[useVoice].NoteOn(msg.NoteNumber());
         }
       }
       else if (msg.StatusMsg() == IMidiMsg::kNoteOff)
       {
         short unUseVoice;
-        for (int i = 0; i < 10; ++i)
+        for (int i = 0; i < NUMBER_OF_VOICES; ++i)
         {
           if (mVoices[i] == msg.NoteNumber())
           {
@@ -244,16 +251,16 @@ ProphetW::ProcessBlock(sample **inputs, sample **outputs, int nFrames)
             break;
           }
         }
-        mSynth[unUseVoice].NoteOff(msg.NoteNumber());
+        mVoice[unUseVoice].NoteOff(msg.NoteNumber());
       }
       mMidiQueue.Remove();
     }
     double allLeft = 0.0;
     double allRight = 0.0;
-    for (int i = 0; i < 10; ++i)
+    for (int i = 0; i < NUMBER_OF_VOICES; ++i)
     {
-      allLeft += mSynth[i].getLeft();
-      allRight += mSynth[i].getRight();
+      allLeft += mVoice[i].getLeft();
+      allRight += mVoice[i].getRight();
     }
     *out01++ = allLeft;
     *out02++ = allRight;
@@ -283,74 +290,86 @@ ProphetW::OnParamChangeUI(int paramIdx, EParamSource source)
 
   if (paramIdx >= kParamOsc0 && paramIdx <= kParamOsc0 + 15)
   {
-    for (int i = 0; i < 10; ++i)
+    for (int i = 0; i < NUMBER_OF_VOICES; ++i)
     {
-      mSynth[i].m_osc[paramIdx - kParamOsc0].setIsOn(value == 1.0 ? true : false);
+      mVoice[i].m_osc[paramIdx - kParamOsc0].setIsOn(value == 1.0 ? true : false);
     }
   }
 
   if (paramIdx >= kParamOsc0Vol && paramIdx <= kParamOsc0Vol + 3)
   {
-    for (int i = 0; i < 10; ++i)
+    for (int i = 0; i < NUMBER_OF_VOICES; ++i)
     {
-      mSynth[i].setOscVol(paramIdx - kParamOsc0Vol, value);
+      mVoice[i].setOscVol(paramIdx - kParamOsc0Vol, value);
     }
   }
 
   if (paramIdx >= kParamOsc0Freq && paramIdx <= kParamOsc0Freq + 3)
   {
-    for (int i = 0; i < 10; ++i)
+    for (int i = 0; i < NUMBER_OF_VOICES; ++i)
     {
-      mSynth[i].setOscFreq(paramIdx - kParamOsc0Freq, value);
+      mVoice[i].setOscFreq(paramIdx - kParamOsc0Freq, value);
     }
   }
 
   if (paramIdx >= kParamOsc0Fine && paramIdx <= kParamOsc0Fine + 3)
   {
-    for (int i = 0; i < 10; ++i)
+    for (int i = 0; i < NUMBER_OF_VOICES; ++i)
     {
-      mSynth[i].setOscFine(paramIdx - kParamOsc0Fine, value);
+      mVoice[i].setOscFine(paramIdx - kParamOsc0Fine, value);
     }
   }
 
   if (paramIdx >= kParamOsc0PulseWidth && paramIdx <= kParamOsc0PulseWidth + 3)
   {
-    for (int i = 0; i < 10; ++i)
+    for (int i = 0; i < NUMBER_OF_VOICES; ++i)
     {
-      mSynth[i].setOscPulseWidth(paramIdx - kParamOsc0PulseWidth, value);
+      mVoice[i].setOscPulseWidth(paramIdx - kParamOsc0PulseWidth, value);
     }
   }
 
   switch (paramIdx)
   {
     case kParamAttack:
-      for (int i = 0; i < 10; ++i)
+      for (int i = 0; i < NUMBER_OF_VOICES; ++i)
       {
-        mSynth[i].setEnvelope(Envelope::kAttack, value);
+        mVoice[i].setEnvelope(Envelope::kAttack, value);
       }
       break;
     case kParamDecay:
-      for (int i = 0; i < 10; ++i)
+      for (int i = 0; i < NUMBER_OF_VOICES; ++i)
       {
-        mSynth[i].setEnvelope(Envelope::kDecay, value);
+        mVoice[i].setEnvelope(Envelope::kDecay, value);
       }
       break;
     case kParamSustain:
-      for (int i = 0; i < 10; ++i)
+      for (int i = 0; i < NUMBER_OF_VOICES; ++i)
       {
-        mSynth[i].setEnvelope(Envelope::kSustain, value);
+        mVoice[i].setEnvelope(Envelope::kSustain, value);
       }
       break;
     case kParamRelease:
-      for (int i = 0; i < 10; ++i)
+      for (int i = 0; i < NUMBER_OF_VOICES; ++i)
       {
-        mSynth[i].setEnvelope(Envelope::kRelease, value);
+        mVoice[i].setEnvelope(Envelope::kRelease, value);
       }
       break;
     case kMainVolume:
-      for (int i = 0; i < 10; ++i)
+      for (int i = 0; i < NUMBER_OF_VOICES; ++i)
       {
-        mSynth[i].setMasterVolume(value);
+        mVoice[i].setMasterVolume(value);
+      }
+      break;
+    case kParamFilterCutoff:
+      for (int i = 0; i < NUMBER_OF_VOICES; ++i)
+      {
+        mVoice[i].setCutOff(value);
+      }
+      break;
+    case kParamFilterResonance:
+      for (int i = 0; i < NUMBER_OF_VOICES; ++i)
+      {
+        mVoice[i].setResonance(value);
       }
       break;
   }

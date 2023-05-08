@@ -1,6 +1,8 @@
 #ifndef __OSCILATOR_H__
 #define __OSCILATOR_H__
 
+#include "Filter.h"
+
 //------------------------------------------------------------------------------------------
 // Oscilator
 //------------------------------------------------------------------------------------------
@@ -12,6 +14,8 @@ public:
   double get();
   void setSampleRate(unsigned long);
   void setFreq(double);
+  void setCutOff(double cutOff);
+  void setResonance(double res);
   void noteOn();
   void noteOff();
   void setWaveform(unsigned char ucWaveform);
@@ -45,11 +49,15 @@ private:
   unsigned short m_usPulseWidth;    // Pulse width in bits.
   unsigned long m_ulSampleRate;
   double m_dFreq;
+  double m_dCutOff;
+  double m_dRes;
   unsigned char m_ucWaveform;
   double m_dVolume;
   unsigned short m_usCurrent;  // x position in sample curve.
   double m_dPulseWidthInPercent;
   bool m_bIsOn;
+  Filter m_filter;
+  MoogFilter m_moogFilter;
 };
 
 #endif  // __OSCILATOR_H__
