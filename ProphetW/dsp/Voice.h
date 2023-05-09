@@ -46,6 +46,7 @@ private:
   double mOsc4PulseWidth;
   Envelope m_envelope;
   double mVolume;
+  bool mIsOn;
 };
 
 #endif  // __VOICE_H__

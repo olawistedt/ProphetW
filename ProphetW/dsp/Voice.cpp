@@ -144,6 +144,7 @@ Voice::setResonance(double resonance)
 void
 Voice::NoteOn(unsigned char ucNote)
 {
+  mIsOn = true;
   m_ucNote = ucNote;
 
   //for (int i = 0; i < 16; i++)
@@ -157,6 +158,7 @@ Voice::NoteOn(unsigned char ucNote)
 void
 Voice::NoteOff(unsigned char ucNote)
 {
+  mIsOn = false;
   //for (int i = 0; i < 16; i++)
   //{
   //  m_osc[i].noteOff();
@@ -169,6 +171,11 @@ static double m_fCurrentEnvelopeVal;
 double
 Voice::getMono()
 {
+  if (!mIsOn)
+  {
+    return 0.0;
+  }
+
   int osc1Note = m_ucNote + mOsc1Freq;
   int osc2Note = m_ucNote + mOsc2Freq;
   int osc3Note = m_ucNote + mOsc3Freq;
