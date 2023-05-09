@@ -4,7 +4,7 @@
 #include "dsp/Voice.h"
 
 const int kNumPresets = 1;
-const int NUMBER_OF_VOICES = 20;
+const int NUMBER_OF_VOICES = 10;
 
 
 enum EParams
@@ -55,8 +55,8 @@ public:
   //  void OnParamChange(int paramIdx) override;
   void OnParamChangeUI(int paramIdx, EParamSource source = kUnknown) override;
 
-  Voice mVoice[10];  // 10 voices
-  short mVoices[10];
+  Voice mVoice[NUMBER_OF_VOICES];
+  short mVoices[NUMBER_OF_VOICES];
 
 protected:
   IMidiQueue mMidiQueue;

@@ -22,22 +22,22 @@ Moog(double cutoff, double fs, double res)
 //  scale = e^((1-p)*1.386249;
   r = res*scale;
   y4 = output;
-  
+
   double y1=y2=y3=y4=oldx=oldy1=oldy2=oldy3=0.0;
-  
+
   //Loop
   //--Inverted feed back for corner peaking
   x = input - r*y4;
-  
+
   //Four cascaded onepole filters (bilinear transform)
   y1=x*p + oldx*p - k*y1;
   y2=y1*p+oldy1*p - k*y2;
   y3=y2*p+oldy2*p - k*y3;
   y4=y3*p+oldy3*p - k*y4;
-  
+
   //Clipper band limited sigmoid
   y4 = y4 - (y4^3)/6;
-  
+
   oldx = x;
   oldy1 = y1;
   oldy2 = y2;
