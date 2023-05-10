@@ -44,7 +44,6 @@ Oscilator::get()
     default: throw("No such waveform");
   }
 
-  //  dValue = m_filter.lowPassFilter12db(dValue, m_dCutOff, m_ulSampleRate);
   dValue = m_moogFilter.process(dValue);
 
   return dValue;

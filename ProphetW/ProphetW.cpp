@@ -8,11 +8,6 @@
 
 ProphetW::ProphetW(const InstanceInfo &info) : Plugin(info, MakeConfig(kNumParams, kNumPresets))
 {
-  for (int i = 0; i < NUMBER_OF_VOICES; i++)
-  {
-    mVoices[i] = -1;
-  }
-
   GetParam(kParamAttack)->InitDouble("Attack", 0., 0., 1000.0, 0.1, "msec");
   GetParam(kParamDecay)->InitDouble("Decay", 3000., 0., 3000.0, 0.1, "msec");
   GetParam(kParamSustain)->InitDouble("Sustain", 0., 0., 1.0, 0.1, "%");
@@ -223,35 +218,26 @@ ProphetW::ProcessBlock(sample **inputs, sample **outputs, int nFrames)
       IMidiMsg msg = mMidiQueue.Peek();
       if (msg.StatusMsg() == IMidiMsg::kNoteOn)
       {
-        short useVoice = -1;
         // Allocate a voice for the note.
         for (int i = 0; i < NUMBER_OF_VOICES; ++i)
         {
-          if (mVoices[i] == -1)
+          if (mVoice[i].mIsOn == false)
           {
-            useVoice = i;
-            mVoices[i] = msg.NoteNumber();
+            mVoice[i].NoteOn(msg.NoteNumber());
             break;
           }
-        }
-        if (useVoice != -1)
-        {
-          mVoice[useVoice].NoteOn(msg.NoteNumber());
         }
       }
       else if (msg.StatusMsg() == IMidiMsg::kNoteOff)
       {
-        short unUseVoice;
         for (int i = 0; i < NUMBER_OF_VOICES; ++i)
         {
-          if (mVoices[i] == msg.NoteNumber())
+          if (mVoice[i].m_sNote == msg.NoteNumber())
           {
-            unUseVoice = i;
-            mVoices[i] = -1;
+            mVoice[i].NoteOff();
             break;
           }
         }
-        mVoice[unUseVoice].NoteOff(msg.NoteNumber());
       }
       mMidiQueue.Remove();
     }

@@ -4,7 +4,7 @@
 #endif
 #include <string>
 
-Voice::Voice() : m_ucNote(0)
+Voice::Voice() : m_sNote(-1), mIsOn(false)
 {
   for (int i = 0; i < 16; i++)
   {
@@ -142,10 +142,10 @@ Voice::setResonance(double resonance)
 }
 
 void
-Voice::NoteOn(unsigned char ucNote)
+Voice::NoteOn(short sNote)
 {
   mIsOn = true;
-  m_ucNote = ucNote;
+  m_sNote = sNote;
 
   //for (int i = 0; i < 16; i++)
   //{
@@ -156,9 +156,10 @@ Voice::NoteOn(unsigned char ucNote)
 }
 
 void
-Voice::NoteOff(unsigned char ucNote)
+Voice::NoteOff()
 {
   mIsOn = false;
+  m_sNote = -1;
   //for (int i = 0; i < 16; i++)
   //{
   //  m_osc[i].noteOff();
@@ -176,26 +177,26 @@ Voice::getMono()
     return 0.0;
   }
 
-  int osc1Note = m_ucNote + mOsc1Freq;
-  int osc2Note = m_ucNote + mOsc2Freq;
-  int osc3Note = m_ucNote + mOsc3Freq;
-  int osc4Note = m_ucNote + mOsc4Freq;
+  int osc1Note = m_sNote + mOsc1Freq;
+  int osc2Note = m_sNote + mOsc2Freq;
+  int osc3Note = m_sNote + mOsc3Freq;
+  int osc4Note = m_sNote + mOsc4Freq;
 
   if (osc1Note < 1 || osc1Note >= 138)
   {
-    osc1Note = m_ucNote;
+    osc1Note = m_sNote;
   }
   if (osc2Note < 1 || osc2Note >= 138)
   {
-    osc2Note = m_ucNote;
+    osc2Note = m_sNote;
   }
   if (osc3Note < 1 || osc3Note >= 138)
   {
-    osc3Note = m_ucNote;
+    osc3Note = m_sNote;
   }
   if (osc4Note < 1 || osc4Note >= 138)
   {
-    osc4Note = m_ucNote;
+    osc4Note = m_sNote;
   }
 
   double osc1Fine = mOsc1Fine < 0 ?

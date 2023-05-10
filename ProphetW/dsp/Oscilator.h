@@ -56,7 +56,6 @@ private:
   unsigned short m_usCurrent;  // x position in sample curve.
   double m_dPulseWidthInPercent;
   bool m_bIsOn;
-  Filter m_filter;
   MoogFilter m_moogFilter;
 };
 
