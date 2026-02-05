@@ -1,168 +1,454 @@
 #include "ProphetW.h"
 #include "IPlug_include_in_plug_src.h"
-#include "LFO.h"
+#include <string>
 
-ProphetW::ProphetW(const InstanceInfo& info)
-: iplug::Plugin(info, MakeConfig(kNumParams, kNumPresets))
+#if IPLUG_EDITOR
+#include "IControls.h"
+#endif
+
+#ifdef OLA_LOG_TO_FILE
+#include <filesystem>
+#include <fstream>
+std::ofstream gLogFile;
+#endif
+
+ProphetW::ProphetW(const InstanceInfo &info) :
+  Plugin(info, MakeConfig(kNumParams, kNumPresets)),
+  mPlugUIScale(0.5)
 {
-  GetParam(kParamGain)->InitDouble("Gain", 100., 0., 100.0, 0.01, "%");
-  GetParam(kParamNoteGlideTime)->InitMilliseconds("Note Glide Time", 0., 0.0, 30.);
-  GetParam(kParamAttack)->InitDouble("Attack", 10., 1., 1000., 0.1, "ms", IParam::kFlagsNone, "ADSR", IParam::ShapePowCurve(3.));
-  GetParam(kParamDecay)->InitDouble("Decay", 10., 1., 1000., 0.1, "ms", IParam::kFlagsNone, "ADSR", IParam::ShapePowCurve(3.));
-  GetParam(kParamSustain)->InitDouble("Sustain", 50., 0., 100., 1, "%", IParam::kFlagsNone, "ADSR");
-  GetParam(kParamRelease)->InitDouble("Release", 10., 2., 1000., 0.1, "ms", IParam::kFlagsNone, "ADSR");
-  GetParam(kParamLFOShape)->InitEnum("LFO Shape", LFO<>::kTriangle, {LFO_SHAPE_VALIST});
-  GetParam(kParamLFORateHz)->InitFrequency("LFO Rate", 1., 0.01, 40.);
-  GetParam(kParamLFORateTempo)->InitEnum("LFO Rate", LFO<>::k1, {LFO_TEMPODIV_VALIST});
-  GetParam(kParamLFORateMode)->InitBool("LFO Sync", true);
-  GetParam(kParamLFODepth)->InitPercentage("LFO Depth");
-    
-#if IPLUG_EDITOR // http://bit.ly/2S64BDd
-  mMakeGraphicsFunc = [&]() {
-    return MakeGraphics(*this, PLUG_WIDTH, PLUG_HEIGHT, PLUG_FPS, GetScaleForScreen(PLUG_WIDTH, PLUG_HEIGHT));
-  };
-  
-  mLayoutFunc = [&](IGraphics* pGraphics) {
-    pGraphics->AttachCornerResizer(EUIResizerMode::Scale, false);
-    pGraphics->AttachPanelBackground(COLOR_GRAY);
-    pGraphics->EnableMouseOver(true);
-    pGraphics->EnableMultiTouch(true);
-    
-#ifdef OS_WEB
-    pGraphics->AttachPopupMenuControl();
+  for (int i = 0; i < 10; i++)
+  {
+    mVoices[i] = -1;
+  }
+
+#ifdef OLA_LOG_TO_FILE
+  const std::string logPath = "C:\\Users\\ola\\SimpleSynth.log.txt";
+  gLogFile.open(logPath, std::ios::out);  // std::ios::out overwrites the file
+  gLogFile << "Simple Synth Logger started\n";
+  gLogFile.flush();
 #endif
 
-//    pGraphics->EnableLiveEdit(true);
+  GetParam(kParamVolumeAttack)->InitDouble("Volume Attack", 100., 100., 4000.0, 10., "msec");
+  GetParam(kParamVolumeDecay)->InitDouble("Volume Decay", 1500., 0., 4000.0, 10., "msec");
+  GetParam(kParamVolumeSustain)->InitDouble("Volume Sustain", 0.5, 0., 1.0, 0.01, "%");
+  GetParam(kParamVolumeRelease)->InitDouble("Volume Release", 1000., 0., 4000.0, 10., "msec");
+
+  GetParam(kParamFilterAttack)->InitDouble("Filter Attack", 100., 100., 4000.0, 10., "msec");
+  GetParam(kParamFilterDecay)->InitDouble("Filter Decay", 1500., 0., 4000.0, 10., "msec");
+  GetParam(kParamFilterSustain)->InitDouble("Filter Sustain", 0.5, 0., 1.0, 0.01, "%");
+  GetParam(kParamFilterRelease)->InitDouble("Filter Release", 1000., 0., 4000.0, 10., "msec");
+  GetParam(kParamFilterEnvelopeAmount)->InitDouble("Filter Envelope", 1., 0., 1.0, 0.01, "msec");
+
+  for (int i = 0; i < 16; i++)
+  { // Set waveform 8 as on (8 is the sawtooth waveform for osclitator group 3). All others are set to off.
+    GetParam(kParamOsc0 + i)
+        ->InitBool(std::string("Osc" + std::to_string(i + 1)).c_str(), i == 8 ? true : false);
+  }
+
+  for (int i = 0; i < 4; i++)
+  {
+    GetParam(kParamOsc0Vol + i)
+        ->InitDouble(std::string("Osc" + std::to_string(i + 1) + " Vol").c_str(),
+                     1.0,
+                     0.,
+                     1.0,
+                     0.1,
+                     "db");
+  }
+
+  for (int i = 0; i < 4; i++)
+  {
+    GetParam(kParamOsc0Freq + i)
+        ->InitDouble(std::string("Osc" + std::to_string(i + 1) + " Freq").c_str(),
+                     0.0,
+                     -24.0,
+                     +24.0,
+                     1.0,
+                     "seminotes");
+  }
+
+  for (int i = 0; i < 4; i++)
+  {
+    GetParam(kParamOsc0Fine + i)
+        ->InitDouble(std::string("Osc" + std::to_string(i + 1) + " Fine").c_str(),
+                     0.0,
+                     -1.0,
+                     +1.0,
+                     0.01,
+                     "hz");
+  }
+
+  for (int i = 0; i < 4; i++)
+  {
+    GetParam(kParamOsc0PulseWidth + i)
+        ->InitDouble(std::string("Osc" + std::to_string(i + 1) + " Pulse Width").c_str(),
+                     0.5,
+                     0.,
+                     1.0,
+                     0.01,
+                     "%");
+  }
+
+  GetParam(kParamFilterCutoff)
+      ->InitDouble("Filter Cutoff", 22050.0, 20., 22050.0, 100.0, "hz", 0, "", iplug::IParam::ShapePowCurve(3.5));
+  GetParam(kParamFilterResonance)->InitDouble("Filter Resonance", 0.0, 0.0, 1.0, 0.01, "%");
+  
+  GetParam(kParamFilterOnOff)->InitBool("Filter On/Off", true);
+
+  GetParam(kMainVolume)->InitDouble("Volume", 1.0, 0., 1.0, 0.01, "db");
+
+#if IPLUG_EDITOR  // http://bit.ly/2S64BDd
+  mMakeGraphicsFunc = [&]() { return MakeGraphics(*this, PLUG_WIDTH, PLUG_HEIGHT, PLUG_FPS); };
+
+  mLayoutFunc = [&](IGraphics *pGraphics)
+  {
+    const IBitmap knobLittleBitmap = pGraphics->LoadBitmap(PNGKNBPROPHETBLACK_FN, 127);
+    const IBitmap knobOscBitmap = pGraphics->LoadBitmap(PNGOSC_FN, 3, false);
+    const IBitmap knbProphetBlackBitmap = pGraphics->LoadBitmap(PNGKNBPROPHETBLACK_FN, 127);
+    const IBitmap knbProphetSilverBitmap = pGraphics->LoadBitmap(PNGKNBPROPHETSILVER_FN, 127);
+    const IBitmap btnProphetBlackBitmap = pGraphics->LoadBitmap(PNGBLACKLED_FN, 2);
+
+    pGraphics->SetLayoutOnResize(true);
+    pGraphics->AttachCornerResizer(EUIResizerMode::Scale, false);
     pGraphics->LoadFont("Roboto-Regular", ROBOTO_FN);
-    const IRECT b = pGraphics->GetBounds().GetPadded(-20.f);
+
+    // Background
+    pGraphics->LoadBitmap(BACKGROUND_FN, 1, true);
+    pGraphics->AttachBackground(BACKGROUND_FN);
+
+    // Oscillator buttons
+    pGraphics->AttachControl(new IBSwitchControl(125, 122, btnProphetBlackBitmap, kParamOsc0));
+    pGraphics->AttachControl(new IBSwitchControl(155, 122, btnProphetBlackBitmap, kParamOsc0 + 1));
+    pGraphics->AttachControl(new IBSwitchControl(125, 170, btnProphetBlackBitmap, kParamOsc0 + 2));
+    pGraphics->AttachControl(new IBSwitchControl(155, 170, btnProphetBlackBitmap, kParamOsc0 + 3));
+    pGraphics->AttachControl(new IBSwitchControl(225, 122, btnProphetBlackBitmap, kParamOsc0 + 4));
+    pGraphics->AttachControl(new IBSwitchControl(255, 122, btnProphetBlackBitmap, kParamOsc0 + 5));
+    pGraphics->AttachControl(new IBSwitchControl(225, 170, btnProphetBlackBitmap, kParamOsc0 + 6));
+    pGraphics->AttachControl(new IBSwitchControl(255, 170, btnProphetBlackBitmap, kParamOsc0 + 7));
+    pGraphics->AttachControl(new IBSwitchControl(325, 122, btnProphetBlackBitmap, kParamOsc0 + 8));
+    pGraphics->AttachControl(new IBSwitchControl(355, 122, btnProphetBlackBitmap, kParamOsc0 + 9));
+    pGraphics->AttachControl(new IBSwitchControl(325, 170, btnProphetBlackBitmap, kParamOsc0 + 10));
+    pGraphics->AttachControl(new IBSwitchControl(355, 170, btnProphetBlackBitmap, kParamOsc0 + 11));
+    pGraphics->AttachControl(new IBSwitchControl(425, 122, btnProphetBlackBitmap, kParamOsc0 + 12));
+    pGraphics->AttachControl(new IBSwitchControl(455, 122, btnProphetBlackBitmap, kParamOsc0 + 13));
+    pGraphics->AttachControl(new IBSwitchControl(425, 170, btnProphetBlackBitmap, kParamOsc0 + 14));
+    pGraphics->AttachControl(new IBSwitchControl(455, 170, btnProphetBlackBitmap, kParamOsc0 + 15));
+
+    // Filter on/off button
+    pGraphics->AttachControl(new IBSwitchControl(600, 170, btnProphetBlackBitmap, kParamFilterOnOff));
+
+    // Oscilator group volume
+    pGraphics->AttachControl(new IBKnobControl(110, 260, knbProphetBlackBitmap, kParamOsc0Vol));
+    pGraphics->AttachControl(new IBKnobControl(210, 260, knbProphetBlackBitmap, kParamOsc0Vol + 1));
+    pGraphics->AttachControl(new IBKnobControl(310, 260, knbProphetBlackBitmap, kParamOsc0Vol + 2));
+    pGraphics->AttachControl(new IBKnobControl(410, 260, knbProphetBlackBitmap, kParamOsc0Vol + 3));
+
+    // Oscilator group frequency
+    pGraphics->AttachControl(new IBKnobControl(110, 370, knbProphetBlackBitmap, kParamOsc0Freq));
+    pGraphics->AttachControl(
+        new IBKnobControl(210, 370, knbProphetBlackBitmap, kParamOsc0Freq + 1));
+    pGraphics->AttachControl(
+        new IBKnobControl(310, 370, knbProphetBlackBitmap, kParamOsc0Freq + 2));
+    pGraphics->AttachControl(
+        new IBKnobControl(410, 370, knbProphetBlackBitmap, kParamOsc0Freq + 3));
+
+    // Oscilator group fine
+    pGraphics->AttachControl(new IBKnobControl(110, 480, knbProphetBlackBitmap, kParamOsc0Fine));
+    pGraphics->AttachControl(
+        new IBKnobControl(210, 480, knbProphetBlackBitmap, kParamOsc0Fine + 1));
+    pGraphics->AttachControl(
+        new IBKnobControl(310, 480, knbProphetBlackBitmap, kParamOsc0Fine + 2));
+    pGraphics->AttachControl(
+        new IBKnobControl(410, 480, knbProphetBlackBitmap, kParamOsc0Fine + 3));
+
+    // Oscilator group pulse width
+    pGraphics->AttachControl(
+        new IBKnobControl(110, 600, knbProphetBlackBitmap, kParamOsc0PulseWidth));
+    pGraphics->AttachControl(
+        new IBKnobControl(210, 600, knbProphetBlackBitmap, kParamOsc0PulseWidth + 1));
+    pGraphics->AttachControl(
+        new IBKnobControl(310, 600, knbProphetBlackBitmap, kParamOsc0PulseWidth + 2));
+    pGraphics->AttachControl(
+        new IBKnobControl(410, 600, knbProphetBlackBitmap, kParamOsc0PulseWidth + 3));
+
+    // Filter
+    pGraphics->AttachControl(new IBKnobControl(710, 160, knobLittleBitmap, kParamFilterCutoff));
+    pGraphics->AttachControl(new IBKnobControl(810, 160, knobLittleBitmap, kParamFilterResonance));
+
+    // Filter Envelope
+    pGraphics->AttachControl(
+        new IBKnobControl(950, 160, knobLittleBitmap, kParamFilterEnvelopeAmount));
+    pGraphics->AttachControl(new IBKnobControl(710, 260, knobLittleBitmap, kParamFilterAttack));
+    pGraphics->AttachControl(new IBKnobControl(810, 260, knobLittleBitmap, kParamFilterDecay));
+    pGraphics->AttachControl(new IBKnobControl(910, 260, knobLittleBitmap, kParamFilterSustain));
+    pGraphics->AttachControl(new IBKnobControl(1010, 260, knobLittleBitmap, kParamFilterRelease));
+
+    // Amplifier Envelope
+    pGraphics->AttachControl(new IBKnobControl(1160, 160, knobLittleBitmap, kParamVolumeAttack));
+    pGraphics->AttachControl(new IBKnobControl(1260, 160, knobLittleBitmap, kParamVolumeDecay));
+    pGraphics->AttachControl(new IBKnobControl(1360, 160, knobLittleBitmap, kParamVolumeSustain));
+    pGraphics->AttachControl(new IBKnobControl(1460, 160, knobLittleBitmap, kParamVolumeRelease));
+
+    // Master volume
+    pGraphics->AttachControl(new IBKnobControl(1700, 160, knbProphetSilverBitmap, kMainVolume));
+
+#if 1  // Show a keyboard or not
+    //
+    // Keyboard begins
+    //
+    const IRECT b = pGraphics->GetBounds().GetPadded(-70.f);
     const IRECT lfoPanel = b.GetFromLeft(300.f).GetFromTop(200.f);
-    IRECT keyboardBounds = b.GetFromBottom(300);
+    IRECT keyboardBounds = b.GetFromBottom(200);
     IRECT wheelsBounds = keyboardBounds.ReduceFromLeft(100.f).GetPadded(-10.f);
-    pGraphics->AttachControl(new IVKeyboardControl(keyboardBounds), kCtrlTagKeyboard);
-    pGraphics->AttachControl(new IWheelControl(wheelsBounds.FracRectHorizontal(0.5)), kCtrlTagBender);
-    pGraphics->AttachControl(new IWheelControl(wheelsBounds.FracRectHorizontal(0.5, true), IMidiMsg::EControlChangeMsg::kModWheel));
-//    pGraphics->AttachControl(new IVMultiSliderControl<4>(b.GetGridCell(0, 2, 2).GetPadded(-30), "", DEFAULT_STYLE, kParamAttack, EDirection::Vertical, 0.f, 1.f));
-    const IRECT controls = b.GetGridCell(1, 2, 2);
-    pGraphics->AttachControl(new IVKnobControl(controls.GetGridCell(0, 2, 6).GetCentredInside(90), kParamGain, "Gain"));
-    pGraphics->AttachControl(new IVKnobControl(controls.GetGridCell(1, 2, 6).GetCentredInside(90), kParamNoteGlideTime, "Glide"));
-    const IRECT sliders = controls.GetGridCell(2, 2, 6).Union(controls.GetGridCell(3, 2, 6)).Union(controls.GetGridCell(4, 2, 6));
-    pGraphics->AttachControl(new IVSliderControl(sliders.GetGridCell(0, 1, 4).GetMidHPadded(30.), kParamAttack, "Attack"));
-    pGraphics->AttachControl(new IVSliderControl(sliders.GetGridCell(1, 1, 4).GetMidHPadded(30.), kParamDecay, "Decay"));
-    pGraphics->AttachControl(new IVSliderControl(sliders.GetGridCell(2, 1, 4).GetMidHPadded(30.), kParamSustain, "Sustain"));
-    pGraphics->AttachControl(new IVSliderControl(sliders.GetGridCell(3, 1, 4).GetMidHPadded(30.), kParamRelease, "Release"));
-    pGraphics->AttachControl(new IVLEDMeterControl<2>(controls.GetFromRight(100).GetPadded(-30)), kCtrlTagMeter);
-    
-    pGraphics->AttachControl(new IVKnobControl(lfoPanel.GetGridCell(0, 0, 2, 3).GetCentredInside(60), kParamLFORateHz, "Rate"), kNoTag, "LFO")->Hide(true);
-    pGraphics->AttachControl(new IVKnobControl(lfoPanel.GetGridCell(0, 0, 2, 3).GetCentredInside(60), kParamLFORateTempo, "Rate"), kNoTag, "LFO")->DisablePrompt(false);
-    pGraphics->AttachControl(new IVKnobControl(lfoPanel.GetGridCell(0, 1, 2, 3).GetCentredInside(60), kParamLFODepth, "Depth"), kNoTag, "LFO");
-    pGraphics->AttachControl(new IVKnobControl(lfoPanel.GetGridCell(0, 2, 2, 3).GetCentredInside(60), kParamLFOShape, "Shape"), kNoTag, "LFO")->DisablePrompt(false);
-    pGraphics->AttachControl(new IVSlideSwitchControl(lfoPanel.GetGridCell(1, 0, 2, 3).GetFromTop(30).GetMidHPadded(20), kParamLFORateMode, "Sync", DEFAULT_STYLE.WithShowValue(false).WithShowLabel(false).WithWidgetFrac(0.5f).WithDrawShadows(false), false), kNoTag, "LFO");
-    pGraphics->AttachControl(new IVDisplayControl(lfoPanel.GetGridCell(1, 1, 2, 3).Union(lfoPanel.GetGridCell(1, 2, 2, 3)), "", DEFAULT_STYLE, EDirection::Horizontal, 0.f, 1.f, 0.f, 1024), kCtrlTagLFOVis, "LFO");
-    
-    pGraphics->AttachControl(new IVGroupControl("LFO", "LFO", 10.f, 20.f, 10.f, 10.f));
-    
-#ifndef AUv3_API
-    pGraphics->AttachControl(new IVButtonControl(keyboardBounds.GetFromTRHC(200, 30).GetTranslated(0, -30), SplashClickActionFunc,
-      "Show/Hide Keyboard", DEFAULT_STYLE.WithColor(kFG, COLOR_WHITE).WithLabelText({15.f, EVAlign::Middle})))->SetAnimationEndActionFunction(
-      [pGraphics](IControl* pCaller) {
-        static bool hide = false;
-        pGraphics->GetControlWithTag(kCtrlTagKeyboard)->Hide(hide = !hide);
-        pGraphics->Resize(PLUG_WIDTH, hide ? PLUG_HEIGHT / 2 : PLUG_HEIGHT, pGraphics->GetDrawScale());
-    });
-#endif
-    
-//#ifdef OS_IOS
-//    if(!IsOOPAuv3AppExtension())
-//    {
-//      pGraphics->AttachControl(new IVButtonControl(b.GetFromTRHC(100, 100), [pGraphics](IControl* pCaller) {
-//                               dynamic_cast<IGraphicsIOS*>(pGraphics)->LaunchBluetoothMidiDialog(pCaller->GetRECT().L, pCaller->GetRECT().MH());
-//                               SplashClickActionFunc(pCaller);
-//                             }, "BTMIDI"));
-//    }
-//#endif
-    
-    pGraphics->SetQwertyMidiKeyHandlerFunc([pGraphics](const IMidiMsg& msg) {
-                                              pGraphics->GetControlWithTag(kCtrlTagKeyboard)->As<IVKeyboardControl>()->SetNoteFromMidi(msg.NoteNumber(), msg.StatusMsg() == IMidiMsg::kNoteOn);
-                                           });
+
+    pGraphics->AttachControl(new IVKeyboardControl(keyboardBounds, 12, 80), kCtrlTagKeyboard);
+    pGraphics
+        ->AttachControl(new IVButtonControl(
+            keyboardBounds.GetFromTRHC(200, 30).GetTranslated(0, -30),
+            SplashClickActionFunc,
+            "Show/Hide Keyboard",
+            DEFAULT_STYLE.WithColor(kFG, COLOR_WHITE).WithLabelText({ 15.f, EVAlign::Middle })))
+        ->SetAnimationEndActionFunction(
+            [pGraphics](IControl *pCaller)
+            {
+              static bool hide = false;
+              pGraphics->GetControlWithTag(kCtrlTagKeyboard)->Hide(hide = !hide);
+              pGraphics->Resize(PLUG_WIDTH,
+                                hide ? PLUG_HEIGHT / 2 : PLUG_HEIGHT,
+                                pGraphics->GetDrawScale());
+            });
+    //
+    // Keyboard ends
+    //
+#endif  // Show a keyboard or not
+    pGraphics->Resize(PLUG_WIDTH, PLUG_HEIGHT, static_cast<float>(mPlugUIScale), true);
   };
 #endif
 }
 
 #if IPLUG_DSP
-void ProphetW::ProcessBlock(sample** inputs, sample** outputs, int nFrames)
+
+void
+ProphetW::OnReset()
 {
-  mDSP.ProcessBlock(nullptr, outputs, 2, nFrames, mTimeInfo.mPPQPos, mTimeInfo.mTransportIsRunning);
-  mMeterSender.ProcessBlock(outputs, nFrames, kCtrlTagMeter);
-  mLFOVisSender.PushData({kCtrlTagLFOVis, {float(mDSP.mLFO.GetLastOutput())}});
+  for (int i = 0; i < kNumVoices; ++i)
+  {
+    mVoice[i].setSampleRate(static_cast<long>(GetSampleRate()));
+  }
+}
+#endif
+
+
+#if IPLUG_DSP
+void
+ProphetW::ProcessBlock(sample **inputs, sample **outputs, int nFrames)
+{
+  // Channel declaration.
+  PLUG_SAMPLE_DST *out01 = outputs[0];
+  PLUG_SAMPLE_DST *out02 = outputs[1];
+
+  for (int s = 0; s < nFrames; s++)
+  {
+    while (!mMidiQueue.Empty())
+    {
+      IMidiMsg msg = mMidiQueue.Peek();
+      if (msg.StatusMsg() == IMidiMsg::kNoteOn)
+      {
+        assert(msg.NoteNumber() != 0);
+        short useVoice = -1;
+        // Allocate a voice for the note.
+        for (int i = 0; i < kNumVoices; ++i)
+        {
+          if (mVoices[i] == -1)
+          {
+            useVoice = i;
+            mVoices[i] = msg.NoteNumber();
+            break;
+          }
+        }
+        if (useVoice != -1)
+        {
+          mVoice[useVoice].NoteOn(msg.NoteNumber());
+        }
+      }
+      else if (msg.StatusMsg() == IMidiMsg::kNoteOff)
+      {
+        short unUseVoice;
+        for (int i = 0; i < kNumVoices; ++i)
+        {
+          if (mVoices[i] == msg.NoteNumber())
+          {
+            unUseVoice = i;
+            mVoices[i] = -1;
+            break;
+          }
+        }
+        mVoice[unUseVoice].NoteOff(msg.NoteNumber());
+      }
+      mMidiQueue.Remove();
+    }
+    double allLeft = 0.0;
+    double allRight = 0.0;
+    for (int i = 0; i < kNumVoices; ++i)
+    {
+      allLeft += mVoice[i].getLeft();
+      allRight += mVoice[i].getRight();
+    }
+    *out01++ = allLeft;
+    *out02++ = allRight;
+  }
 }
 
-void ProphetW::OnIdle()
-{
-  mMeterSender.TransmitData(*this);
-  mLFOVisSender.TransmitData(*this);
-}
-
-void ProphetW::OnReset()
-{
-  mDSP.Reset(GetSampleRate(), GetBlockSize());
-  mMeterSender.Reset(GetSampleRate());
-}
-
-void ProphetW::ProcessMidiMsg(const IMidiMsg& msg)
+void
+ProphetW::ProcessMidiMsg(const IMidiMsg &msg)
 {
   TRACE;
-  
-  int status = msg.StatusMsg();
-  
-  switch (status)
-  {
-    case IMidiMsg::kNoteOn:
-    case IMidiMsg::kNoteOff:
-    case IMidiMsg::kPolyAftertouch:
-    case IMidiMsg::kControlChange:
-    case IMidiMsg::kProgramChange:
-    case IMidiMsg::kChannelAftertouch:
-    case IMidiMsg::kPitchWheel:
-    {
-      goto handle;
-    }
-    default:
-      return;
-  }
-  
-handle:
-  mDSP.ProcessMidiMsg(msg);
-  SendMidiMsg(msg);
+  mMidiQueue.Add(msg);  // Take care of MIDI events in ProcessBlock()
 }
-
-void ProphetW::OnParamChange(int paramIdx)
+//void ProphetW::OnParamChange(int paramIdx)
+void
+ProphetW::OnParamChangeUI(int paramIdx, EParamSource source)
 {
-  mDSP.SetParam(paramIdx, GetParam(paramIdx)->Value());
-}
+  //if (source != kUI)
+  //{
+  //  return;
+  //}
 
-void ProphetW::OnParamChangeUI(int paramIdx, EParamSource source)
-{
-  #if IPLUG_EDITOR
-  if (auto pGraphics = GetUI())
+  double value = GetParam(paramIdx)->Value();
+
+  OutputDebugStringA(std::string("paramIdx = " + std::to_string(paramIdx) + "\n").c_str());
+  OutputDebugStringA(std::string("value = " + std::to_string(value) + "\n").c_str());
+
+
+  if (paramIdx >= kParamOsc0 && paramIdx <= kParamOsc0 + 15)
   {
-    if (paramIdx == kParamLFORateMode)
+    for (int i = 0; i < kNumVoices; ++i)
     {
-      const auto sync = GetParam(kParamLFORateMode)->Bool();
-      pGraphics->HideControl(kParamLFORateHz, sync);
-      pGraphics->HideControl(kParamLFORateTempo, !sync);
+      mVoice[i].m_osc[paramIdx - kParamOsc0].setIsOn(value == 1.0 ? true : false);
     }
   }
-  #endif
+
+  if (paramIdx >= kParamOsc0Vol && paramIdx <= kParamOsc0Vol + 3)
+  {
+    for (int i = 0; i < kNumVoices; ++i)
+    {
+      mVoice[i].setOscVol(paramIdx - kParamOsc0Vol, value);
+    }
+  }
+
+  if (paramIdx >= kParamOsc0Freq && paramIdx <= kParamOsc0Freq + 3)
+  {
+    for (int i = 0; i < kNumVoices; ++i)
+    {
+      mVoice[i].setOscFreq(paramIdx - kParamOsc0Freq, value);
+    }
+  }
+
+  if (paramIdx >= kParamOsc0Fine && paramIdx <= kParamOsc0Fine + 3)
+  {
+    for (int i = 0; i < kNumVoices; ++i)
+    {
+      mVoice[i].setOscFine(paramIdx - kParamOsc0Fine, value);
+    }
+  }
+
+  if (paramIdx >= kParamOsc0PulseWidth && paramIdx <= kParamOsc0PulseWidth + 3)
+  {
+    for (int i = 0; i < kNumVoices; ++i)
+    {
+      mVoice[i].setOscPulseWidth(paramIdx - kParamOsc0PulseWidth, value);
+    }
+  }
+
+  switch (paramIdx)
+  {
+    case kParamVolumeAttack:
+      for (int i = 0; i < kNumVoices; ++i)
+      {
+        mVoice[i].setVolumeEnvelope(Envelope::kAttack, value);
+      }
+      break;
+    case kParamVolumeDecay:
+      for (int i = 0; i < kNumVoices; ++i)
+      {
+        mVoice[i].setVolumeEnvelope(Envelope::kDecay, value);
+      }
+      break;
+    case kParamVolumeSustain:
+      for (int i = 0; i < kNumVoices; ++i)
+      {
+        mVoice[i].setVolumeEnvelope(Envelope::kSustain, value);
+      }
+      break;
+    case kParamVolumeRelease:
+      for (int i = 0; i < kNumVoices; ++i)
+      {
+        mVoice[i].setVolumeEnvelope(Envelope::kRelease, value);
+      }
+      break;
+    case kParamFilterAttack:
+      for (int i = 0; i < kNumVoices; ++i)
+      {
+        mVoice[i].setFilterEnvelope(Envelope::kAttack, value);
+      }
+      break;
+    case kParamFilterDecay:
+      for (int i = 0; i < kNumVoices; ++i)
+      {
+        mVoice[i].setFilterEnvelope(Envelope::kDecay, value);
+      }
+      break;
+    case kParamFilterSustain:
+      for (int i = 0; i < kNumVoices; ++i)
+      {
+        mVoice[i].setFilterEnvelope(Envelope::kSustain, value);
+      }
+      break;
+    case kParamFilterRelease:
+      for (int i = 0; i < kNumVoices; ++i)
+      {
+        mVoice[i].setFilterEnvelope(Envelope::kRelease, value);
+      }
+      break;
+    case kParamFilterEnvelopeAmount:
+      for (int i = 0; i < kNumVoices; ++i)
+      {
+        mVoice[i].setFilterEnvelope(Envelope::kAmount, value);
+      }
+      break;
+
+    case kMainVolume:
+      for (int i = 0; i < kNumVoices; ++i)
+      {
+        mVoice[i].setMasterVolume(value);
+      }
+      break;
+    case kParamFilterCutoff:
+      for (int i = 0; i < kNumVoices; ++i)
+      {
+        mVoice[i].setCutOff(value);
+      }
+      break;
+    case kParamFilterResonance:
+      for (int i = 0; i < kNumVoices; ++i)
+      {
+        mVoice[i].setResonance(value);
+      }
+      break;
+    case kParamFilterOnOff:
+      for (int i = 0; i < kNumVoices; ++i)
+      {
+        if (value == 1.0)
+        {
+          mVoice[i].setFilterOn();
+        }
+        else
+        {
+          mVoice[i].setFilterOff();
+        }
+      }
+      break;
+  }
 }
 
-bool ProphetW::OnMessage(int msgTag, int ctrlTag, int dataSize, const void* pData)
-{
-  if(ctrlTag == kCtrlTagBender && msgTag == IWheelControl::kMessageTagSetPitchBendRange)
-  {
-    const int bendRange = *static_cast<const int*>(pData);
-    mDSP.mSynth.SetPitchBendRange(bendRange);
-  }
-  
-  return false;
-}
 #endif

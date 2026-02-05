@@ -1,41 +1,41 @@
 #pragma once
 
 #include "IPlug_include_in_plug_hdr.h"
-#include "IControls.h"
+#include "dsp/Voice.h"
 
 const int kNumPresets = 1;
+const int kNumVoices = 10;
 
 enum EParams
 {
-  kParamGain = 0,
-  kParamNoteGlideTime,
-  kParamAttack,
-  kParamDecay,
-  kParamSustain,
-  kParamRelease,
-  kParamLFOShape,
-  kParamLFORateHz,
-  kParamLFORateTempo,
-  kParamLFORateMode,
-  kParamLFODepth,
+  kMainVolume = 0,
+  kParamVolumeAttack,
+  kParamVolumeDecay,
+  kParamVolumeSustain,
+  kParamVolumeRelease,
+  kParamFilterAttack,
+  kParamFilterDecay,
+  kParamFilterSustain,
+  kParamFilterRelease,
+  kParamFilterEnvelopeAmount,
+  kParamOsc0,
+  kParamOsc0Vol = kParamOsc0 + 16,
+  kParamOsc0Freq = kParamOsc0Vol + 4,
+  kParamOsc0Fine = kParamOsc0Freq + 4,
+  kParamOsc0PulseWidth = kParamOsc0Fine + 4,
+  kParamFilterCutoff = kParamOsc0PulseWidth + 4,
+  kParamFilterResonance,
+  kParamFilterOnOff,
   kNumParams
 };
 
-#if IPLUG_DSP
-// will use EParams in ProphetW_DSP.h
-#include "ProphetW_DSP.h"
-#endif
-
-enum EControlTags
+enum ECtrlTags
 {
-  kCtrlTagMeter = 0,
-  kCtrlTagLFOVis,
-  kCtrlTagScope,
-  kCtrlTagRTText,
-  kCtrlTagKeyboard,
-  kCtrlTagBender,
-  kNumCtrlTags
+  kCtrlTagVersionNumber = 0,
+  kCtrlTagTitle,
+  kCtrlTagKeyboard
 };
+
 
 using namespace iplug;
 using namespace igraphics;
@@ -43,21 +43,24 @@ using namespace igraphics;
 class ProphetW final : public Plugin
 {
 public:
-  ProphetW(const InstanceInfo& info);
+  ProphetW(const InstanceInfo &info);
 
-#if IPLUG_DSP // http://bit.ly/2S64BDd
-public:
-  void ProcessBlock(sample** inputs, sample** outputs, int nFrames) override;
-  void ProcessMidiMsg(const IMidiMsg& msg) override;
+#if IPLUG_EDITOR
+  bool OnHostRequestingSupportedViewConfiguration(int width, int height) override { return true; }
+#endif
+
+#if IPLUG_DSP  // http://bit.ly/2S64BDd
+  void ProcessBlock(sample **inputs, sample **outputs, int nFrames) override;
   void OnReset() override;
-  void OnParamChange(int paramIdx) override;
-  void OnParamChangeUI(int paramIdx, EParamSource source) override;
-  void OnIdle() override;
-  bool OnMessage(int msgTag, int ctrlTag, int dataSize, const void* pData) override;
+  void ProcessMidiMsg(const IMidiMsg &msg) override;
+  //  void OnParamChange(int paramIdx) override;
+  void OnParamChangeUI(int paramIdx, EParamSource source = kUnknown) override;
 
-private:
-  ProphetWDSP<sample> mDSP {16};
-  IPeakAvgSender<2> mMeterSender;
-  ISender<1> mLFOVisSender;
+  Voice mVoice[kNumVoices];
+  short mVoices[kNumVoices];
+
+protected:
+  IMidiQueue mMidiQueue;
+  double mPlugUIScale;
 #endif
 };

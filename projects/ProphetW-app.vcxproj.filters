@@ -84,6 +84,18 @@
     <ClCompile Include="..\..\iPlug2\IGraphics\Drawing\IGraphicsSkia.cpp">
       <Filter>IGraphics\Drawing</Filter>
     </ClCompile>
+    <ClCompile Include="..\dsp\Envelope.cpp">
+      <Filter>DSP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dsp\Filter.cpp">
+      <Filter>DSP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dsp\Oscilator.cpp">
+      <Filter>DSP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dsp\Voice.cpp">
+      <Filter>DSP</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\ProphetW.h" />
@@ -278,6 +290,18 @@
       <Filter>IPlug</Filter>
     </ClInclude>
     <ClInclude Include="..\ProphetW_DSP.h" />
+    <ClInclude Include="..\dsp\Envelope.h">
+      <Filter>DSP</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dsp\Filter.h">
+      <Filter>DSP</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dsp\Oscilator.h">
+      <Filter>DSP</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dsp\Voice.h">
+      <Filter>DSP</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="resources">
@@ -315,6 +339,9 @@
     </Filter>
     <Filter Include="IPlug\Extras\Synth">
       <UniqueIdentifier>{fc763cd3-cc76-4d31-9ba4-a4e7361e4adf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DSP">
+      <UniqueIdentifier>{6481af74-5050-43cc-8a71-6da2b7a81277}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

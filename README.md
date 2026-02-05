@@ -1,2 +1,3 @@
-# ProphetW
-A basic MPE capable synthesier plug-in with IGraphics GUI
+# ProphetW readme
+
+iPlug2 template project

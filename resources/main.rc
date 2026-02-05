@@ -90,8 +90,6 @@ BEGIN
         MENUITEM "&Show Control Bounds\tCtrl+B", ID_SHOW_BOUNDS
         MENUITEM "&Show Drawn Area\tCtrl+D",    ID_SHOW_DRAWN
         MENUITEM "&Show FPS\tCtrl+F",           ID_SHOW_FPS
-        MENUITEM SEPARATOR
-        MENUITEM "&Save Screenshot\tCtrl+Shift+S", ID_SCREENSHOT
     END
     POPUP "&Help"
     BEGIN
@@ -137,21 +135,27 @@ END
 // TEXTINCLUDE
 //
 
-1 TEXTINCLUDE
+1 TEXTINCLUDE 
 BEGIN
     "resource.h\0"
 END
 
-2 TEXTINCLUDE
+2 TEXTINCLUDE 
 BEGIN
     "#include ""winres.h""\r\n"
     "\0"
 END
 
-3 TEXTINCLUDE
+3 TEXTINCLUDE 
 BEGIN
     "#include ""..\\config.h""\r\n"
-    "ROBOTO_FN TTF ROBOTO_FN\0"
+    "ROBOTO_FN TTF ROBOTO_FN\r\n"
+    "BACKGROUND_FN PNG BACKGROUND_FN\r\n"
+    "PNGKNBPROPHETBLACK_FN PNG PNGKNBPROPHETBLACK_FN\r\n"
+    "PNGKNBPROPHETSILVER_FN PNG PNGKNBPROPHETSILVER_FN\r\n"
+    "PNGBLACKLED_FN PNG PNGBLACKLED_FN\r\n"
+    "PNGOSC_FN PNG PNGOSC_FN\r\n"
+    "\0"
 END
 
 #endif    // APSTUDIO_INVOKED
@@ -166,6 +170,7 @@ END
 // remains consistent on all systems.
 IDI_ICON1               ICON                    "ProphetW.ico"
 
+
 /////////////////////////////////////////////////////////////////////////////
 //
 // Accelerator
@@ -178,10 +183,8 @@ BEGIN
     "D",            ID_SHOW_DRAWN,          VIRTKEY, CONTROL, NOINVERT
     "F",            ID_SHOW_FPS,            VIRTKEY, CONTROL, NOINVERT
     "E",            ID_LIVE_EDIT,           VIRTKEY, CONTROL, NOINVERT
-    "S",            ID_SCREENSHOT,          VIRTKEY, CONTROL, SHIFT, NOINVERT
 END
 
-/////////////////////////////////////////////////////////////////////////////
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -189,8 +192,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
-FILEVERSION 0,0,1,0
-PRODUCTVERSION 0,0,1,0
+ FILEVERSION 0,0,1,0
+ PRODUCTVERSION 0,0,1,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -233,6 +236,12 @@ END
 //
 #include "..\config.h"
 ROBOTO_FN TTF ROBOTO_FN
+BACKGROUND_FN PNG BACKGROUND_FN
+PNGKNBPROPHETBLACK_FN PNG PNGKNBPROPHETBLACK_FN
+PNGKNBPROPHETSILVER_FN PNG PNGKNBPROPHETSILVER_FN
+PNGBLACKLED_FN PNG PNGBLACKLED_FN
+PNGOSC_FN PNG PNGOSC_FN
+
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED
 
